@@ -1,0 +1,5 @@
+# Ignore everything inside 'generated_arcs'
+generated_arcs/
+
+# Ignore everything inside 'benchmark_results'
+benchmark_results/
