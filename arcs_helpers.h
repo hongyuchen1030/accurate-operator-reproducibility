@@ -139,17 +139,112 @@ static std::vector<Arc_T<double>> generateGreatCircleArcsMPFR(
             arc(i, 1) = endPoint(i).convert_to<double>();
         }
 
-        //generate the constant Zs, which is randomly generated between the two endpoints
-        double randZ = Dist(gen);
-        mpfr_float_1000 constZ_mpfr = startPoint(2) + randZ * abs(endPoint(2) - startPoint(2));
-        double constZ = static_cast<double>(constZ_mpfr);
-        constZs.push_back(constZ);
+        // Generate constant Z values based on latitude constraints
+        mpfr_float_1000 constZ_mpfr;
+
+        if (lat_max <= 89.0) {
+            static bool flipFlag = true; // Persistent flip flag
+            if (flipFlag) {
+            // Calculate a perturbed normal vector
+            double perturbation = Dist(gen) * 0.01;
+            V3_T<mpfr_float_1000> n = simd_cross<mpfr_float_1000>(startPoint, endPoint);
+
+            // Calculate the normalized constant Z
+            mpfr_float_1000 nx_squared_plus_ny_squared = n(0) * n(0) + n(1) * n(1);
+            mpfr_float_1000 norm_n_squared = nx_squared_plus_ny_squared + n(2) * n(2);
+
+            constZ_mpfr = sqrt(nx_squared_plus_ny_squared / norm_n_squared) - perturbation;
+        } else {
+            // Randomly generate constant Z between endpoints
+            double randZ = Dist(gen);
+            constZ_mpfr = startPoint(2) + randZ * abs(endPoint(2) - startPoint(2));
+        }
+
+            // Toggle the flip flag
+            flipFlag = !flipFlag;
+
+        } else {
+            double randZ = Dist(gen);
+            constZ_mpfr = startPoint(2) + randZ * abs(endPoint(2) - startPoint(2));
+
+        }
+
+
+
 
         arcs.push_back(arc);
+        double constZ = static_cast<double>(constZ_mpfr);
+        constZs.push_back(constZ);
     }
 
     return arcs;
 }
+
+
+static std::vector<Arc_T<double>> generateArcsUpGreatCircleArcsMPFR(
+        int numArcs,
+        boost::multiprecision::mpfr_float_1000 per_min, boost::multiprecision::mpfr_float_1000 per_max,
+        std::vector<double>& constZs) 
+{
+    // Random number generator
+    std::mt19937 gen(0);
+    std::uniform_real_distribution<double> Dist(0.0, 1.0);
+
+    // Latitude and longitude range
+    boost::multiprecision::mpfr_float_1000 lat_min = 0.0;
+    boost::multiprecision::mpfr_float_1000 lat_max = 1.0;
+    boost::multiprecision::mpfr_float_1000 lon_min = 0.0;
+    boost::multiprecision::mpfr_float_1000 lon_max = 360.0;
+
+    std::vector<Arc_T<double>> arcs;
+
+    // Generate arcs around the equator
+    for (int arcIdx = 0; arcIdx < numArcs; ++arcIdx) {
+        // Generate random latitudes and longitudes
+        double startLat_double = Dist(gen);
+        double startLon_double = Dist(gen);
+        double endLat_double = Dist(gen);
+        double endLon_double = Dist(gen);
+
+        // Scale the random points to the desired range
+        boost::multiprecision::mpfr_float_1000 startLat = lat_min + startLat_double * (lat_max - lat_min);
+        boost::multiprecision::mpfr_float_1000 startLon = lon_min + startLon_double * (lon_max - lon_min);
+        boost::multiprecision::mpfr_float_1000 endLat = lat_min + endLat_double * (lat_max - lat_min);
+        boost::multiprecision::mpfr_float_1000 endLon = lon_min + endLon_double * (lon_max - lon_min);
+
+        // Convert lat/lon to Cartesian coordinates
+        V3_T<boost::multiprecision::mpfr_float_1000> startPoint = latLonToXYZ<boost::multiprecision::mpfr_float_1000>(startLat, startLon);
+        V3_T<boost::multiprecision::mpfr_float_1000> endPoint = latLonToXYZ<boost::multiprecision::mpfr_float_1000>(endLat, endLon);
+
+        // Create arc with double precision
+        Arc_T<double> arc;
+        for (int j = 0; j < 3; ++j) {
+            arc(j, 0) = startPoint(j).convert_to<double>();
+            arc(j, 1) = endPoint(j).convert_to<double>();
+        }
+
+        // Generate constant Z value with perturbation
+        double perturbation = per_min.convert_to<double>() + (Dist(gen) * (per_max.convert_to<double>() - per_min.convert_to<double>()));
+        V3_T<boost::multiprecision::mpfr_float_1000> n = simd_cross<boost::multiprecision::mpfr_float_1000>(startPoint, endPoint);
+
+        // Normalized constant Z calculation
+        boost::multiprecision::mpfr_float_1000 nx_squared_plus_ny_squared = n(0) * n(0) + n(1) * n(1);
+        boost::multiprecision::mpfr_float_1000 norm_n_squared = nx_squared_plus_ny_squared + n(2) * n(2);
+        boost::multiprecision::mpfr_float_1000 constZ_mpfr = sqrt(nx_squared_plus_ny_squared / norm_n_squared) -
+                                                             static_cast<boost::multiprecision::mpfr_float_1000>(perturbation);
+
+        // Store results
+        arcs.push_back(arc);
+        constZs.push_back(constZ_mpfr.convert_to<double>());
+    }
+
+    return arcs;
+}
+
+
+
+
+
 
 
 

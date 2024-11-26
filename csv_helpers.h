@@ -99,6 +99,18 @@ std::string formatLatitude(double latitude) {
     return latStr;
 }
 
+std::string formatOffset(double offset) {
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(16) << offset;
+    std::string latStr = stream.str();
+    for (auto& c : latStr) {
+        if (c == '.') {
+            c = '_';
+        }
+    }
+    return latStr;
+}
+
 std::vector<double> parseLatitudes(const std::string& input) {
     std::vector<double> latitudes;
     std::stringstream ss(input);

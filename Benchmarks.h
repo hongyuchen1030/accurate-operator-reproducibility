@@ -260,8 +260,11 @@ public:
 // Generic template function to check for NaN and Inf values
 template<typename T>
 bool containsNaNOrInf(const std::tuple<T, T>& results) {
-    return boost::math::isnan(std::get<0>(results)) || boost::math::isnan(std::get<1>(results)) ||
-           boost::math::isinf(std::get<0>(results)) || boost::math::isinf(std::get<1>(results));
+    auto isNaNOrInf = [](const T& value) {
+        return boost::math::isnan(value) || boost::math::isinf(value);
+    };
+
+    return isNaNOrInf(std::get<0>(results)) || isNaNOrInf(std::get<1>(results));
 }
 
 // Function to handle DecomposedFloat creation and error logging
