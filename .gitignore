@@ -1,6 +1,8 @@
-# Ignore everything inside 'generated_arcs'
+# Ignore build directories and generated files
+build_gcc13/
+cmake/
 generated_arcs/
-
-# Ignore everything inside 'benchmark_results'
 benchmark_results/
 intermediate_results/
+__pycache__/
+AccuracyBenchmarkEFTmathematica_data/
