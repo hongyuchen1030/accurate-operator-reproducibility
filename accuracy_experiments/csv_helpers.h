@@ -111,24 +111,24 @@ std::string formatOffset(double offset) {
     return latStr;
 }
 
-std::vector<double> parseLatitudes(const std::string& input) {
-    std::vector<double> latitudes;
+std::vector<double> parseDoubles(const std::string& input) {
+    std::vector<double> doubles;
     std::stringstream ss(input);
     std::string item;
     while (getline(ss, item, ',')) {
-        latitudes.push_back(std::atof(item.c_str()));
+        doubles.push_back(std::atof(item.c_str()));
     }
-    return latitudes;
+    return doubles;
 }
 
-std::vector<int> parseMPFRPrecisions(const std::string& input) {
-    std::vector<int> precisions;
+std::vector<int> parseInts(const std::string& input) {
+    std::vector<int> ints;
     std::stringstream ss(input);
     std::string item;
     while (getline(ss, item, ',')) {
-        precisions.push_back(std::stoi(item));
+        ints.push_back(std::stoi(item));
     }
-    return precisions;
+    return ints;
 }
 
 

@@ -20,8 +20,8 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    auto mpfr_precisions = parseMPFRPrecisions(argv[1]);
-    auto latitudes = parseLatitudes(argv[2]);
+    auto mpfr_precisions = parseInts(argv[1]);
+    auto latitudes = parseDoubles(argv[2]);
 
     std::string basePath = fs::current_path().parent_path().string();
 
@@ -270,8 +270,8 @@ int main(int argc, char* argv[]){
     }
 
 
-    // Generate the offsets
-    std::vector<double> offsets =  parseLatitudes(argv[4]);
+    // Parse the offsets
+    std::vector<double> offsets =  parseDoubles(argv[4]);
 
 
 

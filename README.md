@@ -78,8 +78,13 @@ Below will generate the benchmark for both primary and secondary datasets that's
 # The selected MPFR precisions,
 MPFR_PRECISIONS="16,17,18,19,20,22,24,26,28,30,32"
 
+# Run all method benchmark except for CGAL
 ./run_benchmarks "$MPFR_PRECISIONS" "$LATITUDES"
 echo "run_benchmarks has been executed."
+
+# Run CGAL benchmark
+./CGAL_accuracy "$LATITUDES"
+echo "Complete running of CGAL_accuracy"
 
 ./intermediate_results "$MPFR_PRECISIONS" "$LATITUDES"
 echo "intermediate_results has been executed."

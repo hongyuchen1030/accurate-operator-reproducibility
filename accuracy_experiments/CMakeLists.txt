@@ -14,6 +14,7 @@ find_package(Eigen3 REQUIRED)
 find_package(MPFR REQUIRED)
 find_package(GMP REQUIRED)
 find_package(mp++ REQUIRED)
+find_package(CGAL REQUIRED)
 
 # Create simd_fma library
 add_library(simd_fma INTERFACE)
@@ -52,3 +53,9 @@ target_link_libraries(intermediate_results
     MPFR::MPFR
     GMP::GMP
     mp++::mp++)
+
+
+add_executable(CGAL_accuracy CGAL_accuracy.cc)
+target_link_libraries(CGAL_accuracy CGAL::CGAL Eigen3::Eigen)
+        
+    

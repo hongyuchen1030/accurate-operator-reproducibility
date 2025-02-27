@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     int num_arcs = std::stoi(argv[1]);
 
     // Parse latitudes
-    std::vector<double> latitudes = parseLatitudes(argv[2]);
+    std::vector<double> latitudes = parseDoubles(argv[2]);
 
     // Loop through latitudes and generate arcs
     for (size_t i = 0; i < latitudes.size() - 1; ++i) {
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
     // Now set up the experiment for the arc up cases
 
     // Parse offsets
-    std::vector<double> offsets= parseLatitudes(argv[3]);
+    std::vector<double> offsets= parseDoubles(argv[3]);
 
 
     // loop through offsets and generate arcs, we still using the format for the Lattitude cases
