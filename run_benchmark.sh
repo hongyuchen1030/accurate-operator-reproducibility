@@ -36,22 +36,30 @@ QUERY_RANGE="{0,1},{2,89},{89,90}"
 QUERY_RANGE_ENTIRE_NORTH="{0,90}"
 
 
-# # Optionally run the generated C++ executables
-# ./generate_arcs "$NUM_ARCS" "$LATITUDES"
-# echo "generate_arcs has been executed."
+# Optionally run the generated C++ executables
+./generate_arcs "$NUM_ARCS" "$LATITUDES"
+echo "generate_arcs has been executed."
 
-# ./run_benchmarks "$MPFR_PRECISIONS" "$LATITUDES"
-# echo "run_benchmarks has been executed."
+./run_benchmarks "$MPFR_PRECISIONS" "$LATITUDES"
+echo "run_benchmarks has been executed."
 
-# ./intermediate_results "$MPFR_PRECISIONS" "$LATITUDES"
-# echo "intermediate_results has been executed."
+./intermediate_results "$MPFR_PRECISIONS" "$LATITUDES"
+echo "intermediate_results has been executed."
 
 # Now run the mathematica script
 WOLFRAMSCRIPT_PATH="/usr/bin/wolframscript"
 
-# # # Run AccuracyAnalysis.m
-# # "$WOLFRAMSCRIPT_PATH" -file "$SRC_DIR/AccuracyAnalysis.m" -- "$MPFR_PRECISIONS" "$LATITUDES"
-# # echo "AccuracyAnalysis.m has been executed."
+# Run AccuracyAnalysis.m
+"$WOLFRAMSCRIPT_PATH" -file "$SRC_DIR/AccuracyAnalysis.m" -- "$MPFR_PRECISIONS" "$LATITUDES"
+echo "AccuracyAnalysis.m has been executed."
+
+# Run IntermediateAnalysis.m for different locations
+"$WOLFRAMSCRIPT_PATH" -file "$SRC_DIR/IntermediateAnalysis.m" -- "$MPFR_PRECISIONS" "$LATITUDES" "$QUERY_RANGE"
+echo "IntermediateAnalysis.m for different locations has been executed."
+
+# Run IntermediateAnalysis.m for the entire globe
+"$WOLFRAMSCRIPT_PATH" -file "$SRC_DIR/IntermediateAnalysis.m" -- "$MPFR_PRECISIONS" "$LATITUDES" "$QUERY_RANGE_ENTIRE_NORTH"
+echo "IntermediateAnalysis.m for entire globe has been executed."
 
 # Initialize the OFFSETS
 OFFSETS="0.01"
@@ -66,13 +74,10 @@ done
 
 # Print the OFFSETS
 echo "Generated OFFSETS: $OFFSETS"
+
 "$WOLFRAMSCRIPT_PATH" -file "$SRC_DIR/AccuracyAnalysisArcUp.m" -- "$MPFR_PRECISIONS" "$OFFSETS"
 echo "AccuracyAnalysisArcUp.m has been executed."
 
-# # Run IntermediateAnalysis.m for different locations
-# "$WOLFRAMSCRIPT_PATH" -file "$SRC_DIR/IntermediateAnalysis.m" -- "$MPFR_PRECISIONS" "$LATITUDES" "$QUERY_RANGE"
-# echo "IntermediateAnalysis.m for different locations has been executed."
+"$WOLFRAMSCRIPT_PATH" -file "$SRC_DIR/AccuracyAnalysisArcUpCGAL.m" -- "$MPFR_PRECISIONS" "$OFFSETS"
+echo "AccuracyAnalysisArcUpCGAL.m has been executed."
 
-# # Run IntermediateAnalysis.m for the entire globe
-# "$WOLFRAMSCRIPT_PATH" -file "$SRC_DIR/IntermediateAnalysis.m" -- "$MPFR_PRECISIONS" "$LATITUDES" "$QUERY_RANGE_ENTIRE_NORTH"
-# echo "IntermediateAnalysis.m for entire globe has been executed."

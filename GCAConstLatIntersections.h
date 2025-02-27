@@ -307,7 +307,7 @@ public:
         auto [s2, f] = two_sum(-J, nx_squared_plus_ny_squared);
 
         // Step 7: Vector sum for -j, nx_squared_plus_ny_squared_err, and f
-        double es2 = vec_sum(std::array<double, 3>{-j, nx_squared_plus_ny_squared_err, f});
+        double es2 = -j + nx_squared_plus_ny_squared_err + f;
 
         // Step 8: Apply two_sum to combine s2 and es2
         auto [s2_, es2_] = two_sum(s2, es2);

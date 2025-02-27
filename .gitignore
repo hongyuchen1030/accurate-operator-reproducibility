@@ -3,4 +3,4 @@ generated_arcs/
 
 # Ignore everything inside 'benchmark_results'
 benchmark_results/
-*.csv
+intermediate_results/

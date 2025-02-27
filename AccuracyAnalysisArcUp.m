@@ -183,6 +183,9 @@ importAndProcessBenchmarkData[ourResultsFile_, float64ResultsFile_, quadrupleRes
 
 
 ClearAll[analyzeErrors];
+ summarizeData[data_] := Max[data] 
+(*summarizeData[data_] := Quantile[data, 0.99]*)
+
 analyzeErrors[arcData_, benchmarkData_, mpfrPrecisionList_, analysisPrecision_] := Module[
   {
     baselineResults, ourErrors, meanOurErrors,
@@ -212,7 +215,7 @@ Print["MPFR18 result (First 5 rows): ", N[benchmarkData["MPFR18Results"][[1 ;; 5
     relativeError[baselineResults[[i, 1 ;; 2]], benchmarkData["OurResults"][[i]], baselineResults[[i, 3]], analysisPrecision],
     {i, Length[arcData]}
   ];
-  meanOurErrors = Mean[ourErrors];
+  meanOurErrors = summarizeData[ourErrors];
  
   
   (* Compute relative errors for Float64 results *)
@@ -228,9 +231,9 @@ Print["MPFR18 result (First 5 rows): ", N[benchmarkData["MPFR18Results"][[1 ;; 5
     relativeError[baselineResults[[i, 1 ;; 2]], benchmarkData["Float64Results"][[i, 5 ;; 6]], baselineResults[[i, 3]], analysisPrecision],
     {i, Length[arcData]}
   ];
-  meanFloat64NewErrors = Mean[float64NewErrors];
-  meanFloat64OldErrors = Mean[float64OldErrors];
-  meanFloat64BaselineErrors = Mean[float64BaselineErrors];
+  meanFloat64NewErrors = summarizeData[float64NewErrors];
+  meanFloat64OldErrors = summarizeData[float64OldErrors];
+  meanFloat64BaselineErrors = summarizeData[float64BaselineErrors];
 
   (* Compute relative errors for Quadruple results *)
   quadrupleNewErrors = Table[
@@ -246,9 +249,9 @@ Print["MPFR18 result (First 5 rows): ", N[benchmarkData["MPFR18Results"][[1 ;; 5
     relativeError[baselineResults[[i, 1 ;; 2]], benchmarkData["QuadrupleResults"][[i, 5 ;; 6]], baselineResults[[i, 3]], analysisPrecision],
     {i, Length[arcData]}
   ];
-  meanQuadrupleNewErrors = Mean[quadrupleNewErrors];
-  meanQuadrupleOldErrors = Mean[quadrupleOldErrors];
-  meanQuadrupleBaselineErrors = Mean[quadrupleBaselineErrors];
+  meanQuadrupleNewErrors = summarizeData[quadrupleNewErrors];
+  meanQuadrupleOldErrors = summarizeData[quadrupleOldErrors];
+  meanQuadrupleBaselineErrors = summarizeData[quadrupleBaselineErrors];
   
   (* Initialize dictionaries for MPFR results *)
   meanMPFRNewErrors = Association[];
@@ -269,9 +272,9 @@ Print["MPFR18 result (First 5 rows): ", N[benchmarkData["MPFR18Results"][[1 ;; 5
       relativeError[baselineResults[[i, 1 ;; 2]], benchmarkData["MPFR" <> IntegerString[prec] <> "Results"][[i, 5 ;; 6]], baselineResults[[i, 3]], analysisPrecision],
       {i, Length[arcData]}
     ];
-    meanMPFRNewErrors["MPFR" <> IntegerString[prec] <> "NewMethodErrors"] = Mean[mpfrNewErrors];
-    meanMPFROldErrors["MPFR" <> IntegerString[prec] <> "OldMethodErrors"] = Mean[mpfrOldErrors];
-    meanMPFRBaselineErrors["MPFR" <> IntegerString[prec] <> "BaselineMethodErrors"] = Mean[mpfrBaselineErrors];
+    meanMPFRNewErrors["MPFR" <> IntegerString[prec] <> "NewMethodErrors"] = summarizeData[mpfrNewErrors];
+    meanMPFROldErrors["MPFR" <> IntegerString[prec] <> "OldMethodErrors"] = summarizeData[mpfrOldErrors];
+    meanMPFRBaselineErrors["MPFR" <> IntegerString[prec] <> "BaselineMethodErrors"] = summarizeData[mpfrBaselineErrors];
     ,
     {prec, mpfrPrecisionList}
   ];

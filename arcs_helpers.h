@@ -183,7 +183,7 @@ static std::vector<Arc_T<double>> generateGreatCircleArcsMPFR(
 
 static std::vector<Arc_T<double>> generateArcsUpGreatCircleArcsMPFR(
         int numArcs,
-        boost::multiprecision::mpfr_float_1000 per_min, boost::multiprecision::mpfr_float_1000 per_max,
+        boost::multiprecision::mpfr_float_1000 per_max, boost::multiprecision::mpfr_float_1000 per_min,
         std::vector<double>& constZs) 
 {
     // Random number generator
@@ -192,7 +192,7 @@ static std::vector<Arc_T<double>> generateArcsUpGreatCircleArcsMPFR(
 
     // Latitude and longitude range
     boost::multiprecision::mpfr_float_1000 lat_min = 0.0;
-    boost::multiprecision::mpfr_float_1000 lat_max = 1.0;
+    boost::multiprecision::mpfr_float_1000 lat_max = 1e-4;
     boost::multiprecision::mpfr_float_1000 lon_min = 0.0;
     boost::multiprecision::mpfr_float_1000 lon_max = 360.0;
 
@@ -200,6 +200,7 @@ static std::vector<Arc_T<double>> generateArcsUpGreatCircleArcsMPFR(
 
     // Generate arcs around the equator
     for (int arcIdx = 0; arcIdx < numArcs; ++arcIdx) {
+
         // Generate random latitudes and longitudes
         double startLat_double = Dist(gen);
         double startLon_double = Dist(gen);
@@ -216,30 +217,47 @@ static std::vector<Arc_T<double>> generateArcsUpGreatCircleArcsMPFR(
         V3_T<boost::multiprecision::mpfr_float_1000> startPoint = latLonToXYZ<boost::multiprecision::mpfr_float_1000>(startLat, startLon);
         V3_T<boost::multiprecision::mpfr_float_1000> endPoint = latLonToXYZ<boost::multiprecision::mpfr_float_1000>(endLat, endLon);
 
-        // Create arc with double precision
-        Arc_T<double> arc;
-        for (int j = 0; j < 3; ++j) {
-            arc(j, 0) = startPoint(j).convert_to<double>();
-            arc(j, 1) = endPoint(j).convert_to<double>();
-        }
+        // Compute the normal vector of the great circle arc
+        V3_T<boost::multiprecision::mpfr_float_1000> n = simd_cross(startPoint, endPoint);
 
-        // Generate constant Z value with perturbation
-        double perturbation = per_min.convert_to<double>() + (Dist(gen) * (per_max.convert_to<double>() - per_min.convert_to<double>()));
-        V3_T<boost::multiprecision::mpfr_float_1000> n = simd_cross<boost::multiprecision::mpfr_float_1000>(startPoint, endPoint);
-
-        // Normalized constant Z calculation
+        // Calculate the normalized constant Z
         boost::multiprecision::mpfr_float_1000 nx_squared_plus_ny_squared = n(0) * n(0) + n(1) * n(1);
         boost::multiprecision::mpfr_float_1000 norm_n_squared = nx_squared_plus_ny_squared + n(2) * n(2);
-        boost::multiprecision::mpfr_float_1000 constZ_mpfr = sqrt(nx_squared_plus_ny_squared / norm_n_squared) -
-                                                             static_cast<boost::multiprecision::mpfr_float_1000>(perturbation);
 
-        // Store results
-        arcs.push_back(arc);
-        constZs.push_back(constZ_mpfr.convert_to<double>());
+        boost::multiprecision::mpfr_float_1000 arc_z = sqrt(nx_squared_plus_ny_squared / norm_n_squared);
+        
+        // Calculate the maximum offset range
+        boost::multiprecision::mpfr_float_1000 actual_max = std::min(per_max, arc_z);
+
+        if (arc_z <= per_min) {
+            continue;
+
+        } else {
+            // Generate a perturbation within [per_min, actual_max]
+            double perturbation = per_min.convert_to<double>() + Dist(gen) * (actual_max.convert_to<double>() - per_min.convert_to<double>());
+
+            // Calculate the final constant Z value
+            boost::multiprecision::mpfr_float_1000 constZ_mpfr = arc_z - perturbation;
+
+            // Create arc with double precision
+            Arc_T<double> arc;
+            for (int j = 0; j < 3; ++j) {
+                arc(j, 0) = startPoint(j).convert_to<double>();
+                arc(j, 1) = endPoint(j).convert_to<double>();
+            }
+
+            // Store results
+            arcs.push_back(arc);
+            constZs.push_back(constZ_mpfr.convert_to<double>());
+
+        }
+
+
     }
 
     return arcs;
 }
+
 
 
 
