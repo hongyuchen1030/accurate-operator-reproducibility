@@ -2,7 +2,7 @@
 
 # Define the build directory and source directory
 BUILD_DIR="build_gcc13"
-SRC_DIR="/home/hyvchen/AccuracyBenchmarkEFT"
+SRC_DIR="/home/hyvchen/accurate-operator-reproducibility/accuracy_experiments"
 
 # Clean up the old build directory if it exists
 if [ -d "$BUILD_DIR" ]; then
