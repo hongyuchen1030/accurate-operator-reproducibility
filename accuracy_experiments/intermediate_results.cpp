@@ -104,8 +104,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+
     // Parse the MPFR precisions and latitudes from the input arguments
-    auto mpfr_precisions = parseMPFRPrecisions(argv[1]);
+    auto mpfr_precisions = parseInts(argv[1]);
     auto latitudes = parseDoubles(argv[2]);
 
     // Set the base path to the project root directory (assumed one level up from the current path)

@@ -12,7 +12,7 @@ latitudePoints = ToExpression[StringSplit[latitudeString, ","]];
 
 (* Set the base path as the parent directory of the current working directory *)
 ClearAll[absolutePath];
-absolutePath = DirectoryName[Directory[]];
+absolutePath = DirectoryName[Directory[]]
 
 (* Convert latitude and longitude to Cartesian coordinates on a unit sphere *)
 ClearAll[latLonToXYZ];
@@ -104,6 +104,7 @@ importAndReconstructArcs[arcFilePath_] := Module[{data, reconstructedData},
 ClearAll[importAndProcessCGALBenchmarkData, reconstruct];
 reconstruct[significand_, exponent_] := significand * 2^exponent;
 
+
 importAndProcessCGALBenchmarkData[cgalResultsFile_] := Module[{cgalData},
     cgalData = Rest@Import[cgalResultsFile];
     cgalData = Map[reconstruct @@@ Partition[#, 2] &, cgalData];
@@ -127,13 +128,15 @@ computeRelativeErrors[baselineResults_, benchmarkResults_, analysisPrecision_] :
     {i, Length[baselineResults]}
   ];
 
+
+summarizeData[data_] := Max[data] 
 analyzeCGALErrors[arcData_, benchmarkData_, analysisPrecision_] :=
   Module[{baselineResults, cgalFirstErrors, cgalSecondErrors, cgalErrors, meanCgalErrors},
     baselineResults = computeBaselineResults[arcData, analysisPrecision];
     cgalFirstErrors = computeRelativeErrors[baselineResults, benchmarkData["CGALResults"][[All, 1 ;; 2]], analysisPrecision];
     cgalSecondErrors = computeRelativeErrors[baselineResults, benchmarkData["CGALResults"][[All, 3 ;; 4]], analysisPrecision];
     cgalErrors = MapThread[Min, {cgalFirstErrors, cgalSecondErrors}];
-    meanCgalErrors = Mean[cgalErrors];
+    meanCgalErrors = summarizeData[cgalErrors];
     <|"CGALMethodErrors" -> meanCgalErrors|>
   ];
 

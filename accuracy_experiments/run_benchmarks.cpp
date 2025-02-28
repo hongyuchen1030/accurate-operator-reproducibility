@@ -38,62 +38,13 @@ int main(int argc, char* argv[]){
 
         // Generate arcs for the current latitude range.
         std::string arc_path = basePath+"/generated_arcs/" + arc_file_name;
-        std::vector<double> constZs;
-        std::vector<Arc_T<double>> region_arcs = ReadGreatCircleArcsFromCSVExponent(arc_path,constZs);
-
-        std::vector<Arc_T<double>> sanitized_arcs;
         std::vector<double> sanitized_constZs;
-        sanitized_arcs = region_arcs;
-        sanitized_constZs = constZs;
+        std::vector<Arc_T<double>> sanitized_arcs = ReadGreatCircleArcsFromCSVExponent(arc_path,sanitized_constZs);
+
         std::string output_file_directory = basePath+"/benchmark_results/"+lat_range+"_";
 
 
-        // std::vector<double> p_x_baseline(region_arcs.size(), 0.0);
-        // std::vector<double> p_y_baseline(region_arcs.size(), 0.0);
-        
-
-
-        // Sanitize each arc and write the results to a file.
-        for (int i = 0; i < region_arcs.size(); ++i) {
-            Eigen::Matrix<double, 3, 2> arc = region_arcs[i];
-            // Get the start and end points of the arc
-            V3_T<double> startPoint = arc.col(0);
-            V3_T<double> endPoint = arc.col(1);
-
-            // Get the constant latitude, which is the average of the start and end points/s z values
-            double constZ = constZs[i];
-
-
-            AlgorithmsAccuracyBenchMarks accuracyBenchmark16(startPoint, endPoint, constZ, 16, p_x_baseline[i], p_y_baseline[i]);
-            AlgorithmsAccuracyBenchMarks accuracyBenchmark17(startPoint, endPoint, constZ, 17, p_x_baseline[i], p_y_baseline[i]);
-
-            if (!containsNaNOrInf(accuracyBenchmark16.get_floating_point_baselineEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_floating_point_newEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_floating_point_oldEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_our_accurate_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_mpfr_newEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_mpfr_oldEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_mpfr_baselineEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_our_accurate_result()) &&
-                !containsNaNOrInf(accuracyBenchmark17.get_mpfr_newEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark17.get_mpfr_oldEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark17.get_mpfr_baselineEqn_result())
-                
-                
-                ) {
-
-
-                sanitized_arcs.push_back(region_arcs[i]);
-                sanitized_constZs.push_back(constZs[i]);
-            }
-        }
-
-        // // Now write the sanitized arcs to a file.
-        WriteGreatCircleArcsToCSVExponent(arc_path,sanitized_arcs, sanitized_constZs);
-
-        std::cout<<"Done writing back filtered arcs \n";
-
-        Now run the benchmarks for the sanitized arcs.
+        // Now run the benchmarks for the sanitized arcs.
 
         std::string ourResultsPath = output_file_directory + "our_results_double.csv";
         std::string float64ResultsPath = output_file_directory + "float64_results_double.csv";
@@ -271,7 +222,7 @@ int main(int argc, char* argv[]){
 
 
     // Parse the offsets
-    std::vector<double> offsets =  parseDoubles(argv[4]);
+    std::vector<double> offsets =  parseDoubles(argv[3]);
 
 
 
@@ -282,72 +233,15 @@ int main(int argc, char* argv[]){
         std::string startOffsetStr = formatOffset(startOffset);
         std::string endOffsetStr = formatOffset(endOffset);
         std::string offset_range = startOffsetStr + "_" + endOffsetStr;
-        std::string arc_file_name = offset_range + "Extreme_Arcs_Exponent.csv";
+        std::string arc_file_name = offset_range + "ArcUp_Arcs_Exponent.csv";
 
         // Generate arcs for the current latitude range.
         std::string arc_path = basePath+"/generated_arcs/" + arc_file_name;
-        std::vector<double> constZs;
-        std::vector<Arc_T<double>> region_arcs = ReadGreatCircleArcsFromCSVExponent(arc_path,constZs);
+        std::vector<double> sanitized_constZs_arcup;
+        std::vector<Arc_T<double>> sanitized_arcs_arcup = ReadGreatCircleArcsFromCSVExponent(arc_path,sanitized_constZs_arcup);
 
-        std::vector<Arc_T<double>> sanitized_arcs;
-        std::vector<double> sanitized_constZs;
-        // sanitized_arcs = region_arcs;
-        // sanitized_constZs = constZs;
-        std::string output_file_directory = basePath+"/benchmark_results/"+offset_range+"_Extreme_";
+        std::string output_file_directory = basePath+"/benchmark_results/"+offset_range+"_ArcUp_";
 
-
-        std::vector<double> p_x_baseline(region_arcs.size(), 0.0);
-        std::vector<double> p_y_baseline(region_arcs.size(), 0.0);
-        
-
-
-        // Sanitize each arc and write the results to a file.
-        for (int i = 0; i < region_arcs.size(); ++i) {
-            Eigen::Matrix<double, 3, 2> arc = region_arcs[i];
-            // Get the start and end points of the arc
-            V3_T<double> startPoint = arc.col(0);
-            V3_T<double> endPoint = arc.col(1);
-
-            // Get the constant latitude, which is the average of the start and end points/s z values
-            double constZ = constZs[i];
-
-
-            AlgorithmsAccuracyBenchMarks accuracyBenchmark16(startPoint, endPoint, constZ, 16, p_x_baseline[i], p_y_baseline[i]);
-            AlgorithmsAccuracyBenchMarks accuracyBenchmark17(startPoint, endPoint, constZ, 17, p_x_baseline[i], p_y_baseline[i]);
-            AlgorithmsAccuracyBenchMarks accuracyBenchmark30(startPoint, endPoint, constZ, 30, p_x_baseline[i], p_y_baseline[i]);
-            AlgorithmsAccuracyBenchMarks accuracyBenchmark32(startPoint, endPoint, constZ, 32, p_x_baseline[i], p_y_baseline[i]);
-
-            if (!containsNaNOrInf(accuracyBenchmark16.get_floating_point_baselineEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_floating_point_newEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_floating_point_oldEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_our_accurate_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_mpfr_newEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_mpfr_oldEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_mpfr_baselineEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark16.get_our_accurate_result()) &&
-                !containsNaNOrInf(accuracyBenchmark17.get_mpfr_newEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark17.get_mpfr_oldEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark17.get_mpfr_baselineEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark30.get_mpfr_newEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark30.get_mpfr_oldEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark30.get_mpfr_baselineEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark32.get_mpfr_newEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark32.get_mpfr_oldEqn_result()) &&
-                !containsNaNOrInf(accuracyBenchmark32.get_mpfr_baselineEqn_result())
-                
-                
-                ) {
-
-
-                sanitized_arcs.push_back(region_arcs[i]);
-                sanitized_constZs.push_back(constZs[i]);
-            }
-        }
-
-        // // Now write the sanitized arcs to a file.
-        WriteGreatCircleArcsToCSVExponent(arc_path,sanitized_arcs, sanitized_constZs);
-
-        std::cout<<"Done writing back filtered arcs \n";
 
         // Now run the benchmarks for the sanitized arcs.
 
@@ -371,11 +265,11 @@ int main(int argc, char* argv[]){
         }
 
 
-        for (int i = 0; i < sanitized_arcs.size(); ++i) {
-            Eigen::Matrix<double, 3, 2> arc = sanitized_arcs[i];
+        for (int i = 0; i < sanitized_arcs_arcup.size(); ++i) {
+            Eigen::Matrix<double, 3, 2> arc = sanitized_arcs_arcup[i];
             V3_T<double> Point_A = arc.col(0);
             V3_T<double> Point_B = arc.col(1);
-            double z_0 = sanitized_constZs[i];
+            double z_0 = sanitized_constZs_arcup[i];
 
             //Run double benchmarks
             std::tuple<double, double> float_baseline= gca_constLat_intersection_coordinates_baselineEqn<double>(Point_A, Point_B, z_0);
@@ -477,11 +371,11 @@ int main(int argc, char* argv[]){
                 csvMPFR << "x_newEqn_significand,x_newEqn_exponent,y_newEqn_significand,y_newEqn_exponent,x_oldEqn_significand,x_oldEqn_exponent,y_oldEqn_significand,y_oldEqn_exponent,x_baselineEqn_significand,x__baselineEqn_exponent,y__baselineEqn_significand,y__baselineEqn_exponent\n";
             }
 
-            for (int j = 0; j < sanitized_arcs.size(); ++j) {
-                Eigen::Matrix<double, 3, 2> arc = sanitized_arcs[j];
+            for (int j = 0; j < sanitized_arcs_arcup.size(); ++j) {
+                Eigen::Matrix<double, 3, 2> arc = sanitized_arcs_arcup[j];
                 V3_T<double> Point_A = arc.col(0);
                 V3_T<double> Point_B = arc.col(1);
-                double z_0 = sanitized_constZs[j];
+                double z_0 = sanitized_constZs_arcup[j];
 
                 mpfr_float::default_precision(mpfr_precision);
                 V3_T<mpfr_float> pointA_mpfr = Point_A.cast<mpfr_float>();

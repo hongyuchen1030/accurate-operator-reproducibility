@@ -16,7 +16,7 @@ latitudePoints = ToExpression[StringSplit[latitudeString, ","]];
 
 
 ClearAll[absolutePath];
-absolutePath = "/home/hyvchen/AccuracyBenchmarkEFT/"
+absolutePath = DirectoryName[Directory[]]
 
 (* Convert latitude and longitude to Cartesian coordinates on a unit sphere *)
 ClearAll[latLonToXYZ];
@@ -74,7 +74,7 @@ gcaConstLatIntersectionCoordinatesNewEqn[pointA_List, pointB_List, constZ_, prec
     {SetPrecision[px, precision], SetPrecision[py, precision], SetPrecision[constZ, precision]}
   ];
   
- summarizeData[data_] := Mean[data] 
+ summarizeData[data_] := Max[data] 
 (*summarizeData[data_] := Quantile[data, 0.99]*)
 (* Define a function to compute the relative error with adjustable precision *)
 ClearAll[relativeError];

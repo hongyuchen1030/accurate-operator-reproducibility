@@ -14,9 +14,8 @@ latitudeString = $ScriptCommandLine[[3]];
 mpfrPrecisionList = ToExpression[StringSplit[mpfrPrecisionString, ","]];
 latitudePoints = ToExpression[StringSplit[latitudeString, ","]];
 
-
 ClearAll[absolutePath];
-absolutePath = "/home/hyvchen/AccuracyBenchmarkEFT/"
+absolutePath = DirectoryName[Directory[]]
 
 (* Convert latitude and longitude to Cartesian coordinates on a unit sphere *)
 ClearAll[latLonToXYZ];
@@ -317,11 +316,11 @@ For[i = 1, i < Length[latitudePoints], i++,
   
   (* Generate filenames with precision *)
   latRangeStr = startLatStr <> "_" <> endLatStr;
-  arcFilename = latRangeStr <> "Extreme_Arcs_Exponent.csv";
-  benchmarkOurFilename = latRangeStr <> "_Extreme_our_results_double.csv";
-  benchmarkDoubleFilename = latRangeStr <> "_Extreme_float64_results_double.csv";
-  benchmarkQuadrupleFilename = latRangeStr <> "_Extreme_quadruple_results_double.csv";
-  benchmarkMPFRFilenames = Table[absolutePath <> "benchmark_results/" <> latRangeStr <> "_Extreme_mpfr_" <> IntegerString[mpfrPrecision] <> "_results.csv", {mpfrPrecision, mpfrPrecisionList}];
+  arcFilename = latRangeStr <> "ArcUp_Arcs_Exponent.csv";
+  benchmarkOurFilename = latRangeStr <> "_ArcUp_our_results_double.csv";
+  benchmarkDoubleFilename = latRangeStr <> "_ArcUp_float64_results_double.csv";
+  benchmarkQuadrupleFilename = latRangeStr <> "_ArcUp_quadruple_results_double.csv";
+  benchmarkMPFRFilenames = Table[absolutePath <> "benchmark_results/" <> latRangeStr <> "_ArcUp_mpfr_" <> IntegerString[mpfrPrecision] <> "_results.csv", {mpfrPrecision, mpfrPrecisionList}];
   
   (* Construct the full paths to the files and import data *)
   arcData = importAndReconstructArcs[absolutePath <> "generated_arcs/" <> arcFilename];
@@ -342,11 +341,11 @@ For[i = 1, i < Length[latitudePoints], i++,
 ];
 
 (* Export results to CSV *)
-Export[outputDirectory <> "Our_Relative_Error_Extreme.csv", ourErrorsList, "CSV"];
-Export[outputDirectory <> "Float64_Relative_Error_Extreme.csv", float64ErrorsList, "CSV"];
-Export[outputDirectory <> "Quadruple_Relative_Error_Extreme.csv", quadrupleErrorsList, "CSV"];
+Export[outputDirectory <> "Our_Relative_Error_ArcUp.csv", ourErrorsList, "CSV"];
+Export[outputDirectory <> "Float64_Relative_Error_ArcUp.csv", float64ErrorsList, "CSV"];
+Export[outputDirectory <> "Quadruple_Relative_Error_ArcUp.csv", quadrupleErrorsList, "CSV"];
 Do[
-  Export[outputDirectory <> "MPFR" <> IntegerString[prec] <> "_Relative_Error_Extreme.csv", mpfrErrorsLists[prec], "CSV"],
+  Export[outputDirectory <> "MPFR" <> IntegerString[prec] <> "_Relative_Error_ArcUp.csv", mpfrErrorsLists[prec], "CSV"],
   {prec, mpfrPrecisionList}
 ];
 

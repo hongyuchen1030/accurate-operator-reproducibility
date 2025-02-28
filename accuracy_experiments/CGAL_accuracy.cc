@@ -3,6 +3,7 @@
 #include <Eigen/Dense>
 #include <CGAL/Exact_spherical_kernel_3.h>
 #include <CGAL/iterator.h>
+#include <filesystem>
 namespace fs = std::filesystem;
 
 
@@ -305,7 +306,7 @@ int main(int argc, char* argv[]){
         std::string startOffsetStr = formatOffset(startOffset);
         std::string endOffsetStr = formatOffset(endOffset);
         std::string offset_range = startOffsetStr + "_" + endOffsetStr;
-        std::string arc_file_name = offset_range + "Extreme_Arcs_Exponent.csv";
+        std::string arc_file_name = offset_range + "ArcUp_Arcs_Exponent.csv";
 
         // Generate arcs for the current latitude range.
         std::string arc_path = basePath+"/generated_arcs/" + arc_file_name;
@@ -313,7 +314,7 @@ int main(int argc, char* argv[]){
         std::vector<Arc_T<double>> sanitized_arcs = ReadGreatCircleArcsFromCSVExponent(arc_path,sanitized_constZs);
 
         
-        std::string output_file_directory = basePath+"/benchmark_results/"+offset_range+"_Extreme_";
+        std::string output_file_directory = basePath+"/benchmark_results/"+offset_range+"_ArcUp_";
         std::string cgalResultsPath = output_file_directory + "cgal_double.csv";
         std::ofstream csvCgal(cgalResultsPath, std::ios::out | std::ios::trunc);
         if (csvCgal.is_open()) {

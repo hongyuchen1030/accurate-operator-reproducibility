@@ -1,15 +1,14 @@
 # Ignore build directories and generated files
-build_gcc13/
-cmake/
+accuracy_experiments/build_gcc13/
 __pycache__/
 AccuracyBenchmarkEFTmathematica_data/
 
 # Keep directories but ignore their contents
-generated_arcs/*
-benchmark_results/*
-intermediate_results/*
+accuracy_experiments/generated_arcs/*
+accuracy_experiments/benchmark_results/*
+accuracy_experiments/intermediate_results/*
 
 # Allow empty directories to be tracked
-!generated_arcs/.gitkeep
-!benchmark_results/.gitkeep
-!intermediate_results/.gitkeep
+!accuracy_experiments/generated_arcs/.gitkeep
+!accuracy_experiments/benchmark_results/.gitkeep
+!accuracy_experiments/intermediate_results/.gitkeep

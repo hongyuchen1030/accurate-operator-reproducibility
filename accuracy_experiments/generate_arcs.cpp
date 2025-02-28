@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "Usage: " << argv[0] << " <number_of_arcs> <latitudes> <offsets>\n";
         return 1;
     }
+
     int num_arcs = std::stoi(argv[1]);
 
     // Parse latitudes
@@ -55,7 +56,7 @@ int main(int argc, char* argv[]) {
         std::string startOffsetStr = formatOffset(startOffset);
         std::string endOffsetStr = formatOffset(endOffset);
         std::string offset_range = startOffsetStr + "_" + endOffsetStr;
-        std::string arc_file_name = offset_range + "Extreme_Arcs_Exponent.csv";
+        std::string arc_file_name = offset_range + "ArcUp_Arcs_Exponent.csv";
 
         // Define the relative path to the ./generated_arcs/ directory
         fs::path project_root = fs::current_path().parent_path(); // Get current working directory

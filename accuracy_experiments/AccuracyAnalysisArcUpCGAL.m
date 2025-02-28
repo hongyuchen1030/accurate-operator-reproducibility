@@ -16,7 +16,7 @@ latitudePoints = ToExpression[StringSplit[latitudeString, ","]];
 
 
 ClearAll[absolutePath];
-absolutePath = "/home/hyvchen/AccuracyBenchmarkEFT/"
+absolutePath = DirectoryName[Directory[]]
 
 (* Convert latitude and longitude to Cartesian coordinates on a unit sphere *)
 ClearAll[latLonToXYZ];
@@ -206,8 +206,8 @@ For[i = 1, i < Length[latitudePoints], i++,
   
   (* Generate filenames with precision *)
   latRangeStr = startLatStr <> "_" <> endLatStr;
-  arcFilename = latRangeStr <> "Extreme_Arcs_Exponent.csv";
-  benchmarkCGALFilename = latRangeStr <> "_Extreme_cgal_double.csv";
+  arcFilename = latRangeStr <> "ArcUp_Arcs_Exponent.csv";
+  benchmarkCGALFilename = latRangeStr <> "_ArcUp_cgal_double.csv";
   (* Construct the full paths to the files and import data *)
   arcData = importAndReconstructArcs[absolutePath <> "generated_arcs/" <> arcFilename];
   
@@ -221,7 +221,7 @@ For[i = 1, i < Length[latitudePoints], i++,
 ];
 
 (* Export results to CSV *)
-Export[outputDirectory <> "CGAL_Relative_Error_Extreme.csv", cgalErrorsList, "CSV"];
+Export[outputDirectory <> "CGAL_Relative_Error_ArcUp.csv", cgalErrorsList, "CSV"];
 
 
 Print["Done CSV Writing"];

@@ -11,6 +11,9 @@ mpfrPrecisionString = $ScriptCommandLine[[2]];
 latitudeString = $ScriptCommandLine[[3]];
 queryRangeString = $ScriptCommandLine[[4]];
 
+ClearAll[absolutePath];
+absolutePath = DirectoryName[Directory[]]
+
 (* Convert the comma-separated strings to lists *)
 mpfrPrecisionList = ToExpression[StringSplit[mpfrPrecisionString, ","]];
 latitudePoints = ToExpression[StringSplit[latitudeString, ","]];
@@ -121,8 +124,7 @@ importAndReconstructArcs[arcFilePath_] := Module[
 ];
 
 
-ClearAll[absolutePath];
-absolutePath = "/home/hyvchen/AccuracyBenchmarkEFT"
+
 
 (* Define the baseline function *)
 Clear[gcaConstLatIntersectionCoordinatesNewEqnIntermediate];
