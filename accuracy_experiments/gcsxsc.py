@@ -127,7 +127,7 @@ def read_and_run_extreme_case():
 
         # Create filenames based on latitude ranges
         off_range = f"{start_off_str}_{end_off_str}"
-        arc_file_name = f"{off_range}Extreme_Arcs_Exponent.csv"
+        arc_file_name = f"{off_range}ArcUp_Arcs_Exponent.csv"
         arc_path = os.path.join(base_path, "generated_arcs", arc_file_name)
 
         # Read arcs for the current latitude range
@@ -182,7 +182,7 @@ def read_and_run_extreme_case():
             "x1_significand", "x1_exponent", "y1_significand", "y1_exponent",
             "x2_significand", "x2_exponent", "y2_significand", "y2_exponent"
         ]
-        file_path = os.path.join(base_path, "benchmark_results", f"{off_range}_krumm_double_Extreme.csv")
+        file_path = os.path.join(base_path, "benchmark_results", f"{off_range}_krumm_double_ArcUp.csv")
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
         with open(file_path, mode='w', newline='') as csvfile:

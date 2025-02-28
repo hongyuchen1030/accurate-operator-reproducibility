@@ -295,11 +295,10 @@ void writeIVC_MPFR(const std::vector<intermediate_values_compare<mpfr_float>>& i
 
     // Set stream to scientific notation once
     outFile.precision(precision);
-//    outFile << std::scientific;
 
     for (auto iv : ivcs) {
 //        std::cout << "MPFR precision: " << precision<<" Has Px: " <<iv.nx <<std::endl;
-        outFile << iv.nx << ","
+        outFile<< std::scientific << iv.nx << ","
                 << iv.nNorm << ","
                 << iv.sSquare << ","
                 << iv.s << ","

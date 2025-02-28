@@ -1,0 +1,1831 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 14.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     75066,       1823]
+NotebookOptionsPosition[     73974,       1798]
+NotebookOutlinePosition[     74376,       1814]
+CellTagsIndexPosition[     74333,       1811]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"latitudePoints", " ", "=", " ", 
+    RowBox[{"{", 
+     RowBox[{
+     "0", ",", "0.000001", ",", "0.00001", ",", "0.0001", ",", "0.001", ",", 
+      "0.01", ",", "0.1", ",", "1", ",", "10", ",", "20", ",", "30", ",", 
+      "40", ",", "50", ",", "60", ",", "70", ",", "80", ",", "89", ",", 
+      "89.9", ",", "89.99", ",", "89.990200", ",", "89.990400", ",", 
+      "89.990600", ",", "89.990800", ",", "89.999", ",", "89.9990400", ",", 
+      "89.9990800", ",", "89.9991200", ",", "89.9991600", ",", "89.9999", ",",
+       "89.99990800", ",", "89.99991600", ",", "89.99992400", ",", 
+      "89.99993200", ",", "89.99999", ",", "90"}], "}"}]}], ";"}], "\n", "\n", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"Note", ":", " ", 
+     RowBox[{
+     "This", " ", "notebook", " ", "can", " ", "be", " ", "used", " ", "to", 
+      " ", "run", " ", "the", " ", "analysis", " ", "for", " ", "the", " ", 
+      "primary", " ", "dataset", " ", "or", " ", "secondary", " ", 
+      "dataset"}]}], ",", " ", 
+    RowBox[{"to", " ", "do", " ", "so"}], ",", "\n", "\n", 
+    RowBox[{
+    "Update", " ", "the", " ", "following", " ", "input", " ", "to", " ", 
+     "the", " ", "correct", " ", "one"}], ",", " ", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{
+      "You", " ", "can", " ", "also", " ", "refer", " ", "to", " ", "the", 
+       " ", "naming", " ", "convention", " ", "in", " ", 
+       RowBox[{
+        RowBox[{"your", " ", "."}], "/", "generated_arcs"}], " ", 
+       RowBox[{
+        RowBox[{"and", " ", "."}], "/", "benchmark_results"}], " ", 
+       "directories"}], ")"}], "\n", "\n", "1.", " ", "For", " ", "primary", 
+     " ", "dataset"}], ",", " ", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"use", "\n", "  ", "arcFilename"}], " ", "=", " ", 
+      RowBox[{"latRangeStr", " ", "<>", " ", "\"\<Arcs_Exponent.csv\>\""}]}], 
+     ";", "\n", "  ", 
+     RowBox[{"benchmarkKrummFilename", " ", "=", " ", 
+      RowBox[{
+      "latRangeStr", " ", "<>", " ", "\"\<_krumm_double_ArcUp.csv\>\""}]}], 
+     ";", "\n", "\n", 
+     RowBox[{"2.", " ", "For", " ", "secondary", " ", "dataset"}]}], ",", " ", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"use", "\n", "  ", "arcFilename"}], " ", "=", " ", 
+      RowBox[{
+      "latRangeStr", " ", "<>", " ", "\"\<ArcUp_Arcs_Exponent.csv\>\""}]}], 
+     ";", "\n", "  ", 
+     RowBox[{"benchmarkKrummFilename", " ", "=", " ", 
+      RowBox[{
+      "latRangeStr", " ", "<>", " ", "\"\<_krumm_double_ArcUp.csv\>\""}]}], 
+     ";"}]}], "\n", "  ", "\n", " ", "*)"}], "\n", " ", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Update", " ", "the", " ", "following", " ", "path", " ", "to", " ", 
+    "your", " ", "correct", " ", "one"}], "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "absolutePath", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+  "absolutePath", " ", "=", " ", 
+   "\"\<Your-absolute-path>\""}], "\n", 
+  "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Convert", " ", "latitude", " ", "and", " ", "longitude", " ", "to", " ", 
+    "Cartesian", " ", "coordinates", " ", "on", " ", "a", " ", "unit", " ", 
+    "sphere"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "latLonToXYZ", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"latLonToXYZ", "[", 
+     RowBox[{"lat_", ",", " ", "lon_"}], "]"}], " ", ":=", " ", "\n", "  ", 
+    RowBox[{"With", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"\[Theta]", " ", "=", " ", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"90", " ", "-", " ", "lat"}], ")"}], " ", "Degree"}]}], 
+        ",", " ", 
+        RowBox[{"\[CurlyPhi]", " ", "=", " ", 
+         RowBox[{"lon", " ", "Degree"}]}]}], "}"}], ",", "\n", "    ", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Sin", "[", "\[Theta]", "]"}], " ", 
+         RowBox[{"Cos", "[", "\[CurlyPhi]", "]"}]}], ",", " ", 
+        RowBox[{
+         RowBox[{"Sin", "[", "\[Theta]", "]"}], " ", 
+         RowBox[{"Sin", "[", "\[CurlyPhi]", "]"}]}], ",", " ", 
+        RowBox[{"Cos", "[", "\[Theta]", "]"}]}], "}"}]}], "\n", "  ", "]"}]}],
+    ";"}], "\n", "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Check", " ", "if", " ", "the", " ", "span", " ", "is", " ", "within", " ",
+     "the", " ", "given", " ", "tolerance"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "isSpanCorrect", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"isSpanCorrect", "[", 
+     RowBox[{
+     "startPoint_", ",", " ", "endPoint_", ",", " ", "spanRadians_", ",", " ",
+       "toleranceRadians_"}], "]"}], " ", ":=", " ", "\n", "  ", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "arcLength", "}"}], ",", "\n", "    ", 
+      RowBox[{
+       RowBox[{"arcLength", " ", "=", " ", 
+        RowBox[{"ArcCos", "[", 
+         RowBox[{
+          RowBox[{"Normalize", "[", "startPoint", "]"}], " ", ".", " ", 
+          RowBox[{"Normalize", "[", "endPoint", "]"}]}], "]"}]}], ";", "\n", 
+       "    ", 
+       RowBox[{"arcLength", " ", "<=", " ", 
+        RowBox[{"spanRadians", " ", "+", " ", "toleranceRadians"}]}]}]}], 
+     "\n", "  ", "]"}]}], ";"}], "\n", "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Function", " ", "to", " ", "generate", " ", "random", " ", "great", " ", 
+    "circle", " ", "arcs", " ", "with", " ", "a", " ", "specified", " ", 
+    "span"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "generateGreatCircleArcs", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"generateGreatCircleArcs", "[", 
+     RowBox[{
+     "numArcs_Integer", ",", " ", "latRange_List", ",", " ", "lonRange_List", 
+      ",", " ", 
+      RowBox[{"precision_", ":", " ", "MachinePrecision"}], ",", " ", 
+      RowBox[{"spanDegrees_", ":", " ", 
+       RowBox[{"-", "1.0"}]}], ",", " ", 
+      RowBox[{"toleranceDegrees_", ":", " ", "0.1"}]}], "]"}], " ", ":=", 
+    "\n", "  ", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"arcs", " ", "=", " ", 
+         RowBox[{"{", "}"}]}], ",", " ", "startPoint", ",", " ", "endPoint", 
+        ",", " ", "spanRadians", ",", " ", "toleranceRadians", ",", " ", 
+        "startLat", ",", " ", "startLon", ",", " ", "endLat", ",", " ", 
+        "endLon"}], "}"}], ",", "\n", "    ", 
+      RowBox[{
+       RowBox[{"spanRadians", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{"spanDegrees", " ", ">", " ", "0"}], ",", " ", 
+            RowBox[{"spanDegrees", " ", "Degree"}], ",", " ", "spanDegrees"}],
+            "]"}], ",", " ", "precision"}], "]"}]}], ";", "\n", "    ", 
+       RowBox[{"toleranceRadians", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{
+          RowBox[{"toleranceDegrees", " ", "Degree"}], ",", " ", 
+          "precision"}], "]"}]}], ";", "\n", "\n", "    ", 
+       RowBox[{"While", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Length", "[", "arcs", "]"}], " ", "<", " ", "numArcs"}], 
+         ",", "\n", "      ", 
+         RowBox[{
+          RowBox[{"startLat", " ", "=", " ", 
+           RowBox[{"RandomReal", "[", "latRange", "]"}]}], ";", "\n", 
+          "      ", 
+          RowBox[{"startLon", " ", "=", " ", 
+           RowBox[{"RandomReal", "[", "lonRange", "]"}]}], ";", "\n", 
+          "      ", 
+          RowBox[{"endLat", " ", "=", " ", 
+           RowBox[{"RandomReal", "[", "latRange", "]"}]}], ";", "\n", 
+          "      ", 
+          RowBox[{"endLon", " ", "=", " ", 
+           RowBox[{"RandomReal", "[", "lonRange", "]"}]}], ";", "\n", 
+          "      ", 
+          RowBox[{"startPoint", " ", "=", " ", 
+           RowBox[{"latLonToXYZ", "[", 
+            RowBox[{
+             RowBox[{"SetPrecision", "[", 
+              RowBox[{"startLat", ",", " ", "precision"}], "]"}], ",", " ", 
+             RowBox[{"SetPrecision", "[", 
+              RowBox[{"startLon", ",", " ", "precision"}], "]"}]}], "]"}]}], 
+          ";", "\n", "      ", 
+          RowBox[{"endPoint", " ", "=", " ", 
+           RowBox[{"latLonToXYZ", "[", 
+            RowBox[{
+             RowBox[{"SetPrecision", "[", 
+              RowBox[{"endLat", ",", " ", "precision"}], "]"}], ",", " ", 
+             RowBox[{"SetPrecision", "[", 
+              RowBox[{"endLon", ",", " ", "precision"}], "]"}]}], "]"}]}], 
+          ";", "\n", "\n", "      ", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"spanDegrees", " ", "<=", " ", "0"}], " ", "||", " ", 
+             RowBox[{"isSpanCorrect", "[", 
+              RowBox[{
+              "startPoint", ",", " ", "endPoint", ",", " ", "spanRadians", 
+               ",", " ", "toleranceRadians"}], "]"}]}], ",", "\n", "        ", 
+            RowBox[{"AppendTo", "[", 
+             RowBox[{"arcs", ",", " ", 
+              RowBox[{"{", 
+               RowBox[{"startPoint", ",", " ", "endPoint"}], "}"}]}], "]"}]}],
+            "\n", "      ", "]"}]}]}], "\n", "    ", "]"}], ";", "\n", "\n", 
+       "    ", "arcs"}]}], "\n", "]"}]}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Function", " ", "to", " ", "calculate", " ", "intersection", " ", 
+    "coordinates", " ", "with", " ", "a", " ", "specified", " ", 
+    "precision"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "gcaConstLatIntersectionCoordinatesNewEqn", "]"}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"gcaConstLatIntersectionCoordinatesNewEqn", "[", 
+     RowBox[{
+     "pointA_List", ",", " ", "pointB_List", ",", " ", "constZ_", ",", " ", 
+      RowBox[{"precision_", ":", " ", "MachinePrecision"}]}], "]"}], " ", ":=",
+     " ", "\n", "  ", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "n", ",", " ", "nx", ",", " ", "ny", ",", " ", "nz", ",", " ", 
+        "nxSquared", ",", " ", "nySquared", ",", " ", "nzSquared", ",", " ", 
+        "normNSquared", ",", " ", "sTilde", ",", " ", "px", ",", " ", "py"}], 
+       "}"}], ",", "\n", "    ", 
+      RowBox[{
+       RowBox[{"n", " ", "=", " ", 
+        RowBox[{"Cross", "[", 
+         RowBox[{"pointA", ",", " ", "pointB"}], "]"}]}], ";", "\n", "    ", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"nx", ",", " ", "ny", ",", " ", "nz"}], "}"}], " ", "=", " ",
+         "n"}], ";", "\n", "    ", 
+       RowBox[{"nxSquared", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{
+          RowBox[{"nx", "^", "2"}], ",", " ", "precision"}], "]"}]}], ";", 
+       "\n", "    ", 
+       RowBox[{"nySquared", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{
+          RowBox[{"ny", "^", "2"}], ",", " ", "precision"}], "]"}]}], ";", 
+       "\n", "    ", 
+       RowBox[{"nzSquared", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{
+          RowBox[{"nz", "^", "2"}], ",", " ", "precision"}], "]"}]}], ";", 
+       "\n", "    ", 
+       RowBox[{"normNSquared", " ", "=", " ", 
+        RowBox[{
+        "nxSquared", " ", "+", " ", "nySquared", " ", "+", " ", 
+         "nzSquared"}]}], " ", ";", "\n", "    ", 
+       RowBox[{"sTilde", " ", "=", " ", 
+        RowBox[{"Sqrt", "[", 
+         RowBox[{"nxSquared", " ", "+", " ", "nySquared", " ", "-", " ", 
+          RowBox[{"normNSquared", " ", 
+           RowBox[{"SetPrecision", "[", 
+            RowBox[{
+             RowBox[{"constZ", "^", "2"}], ",", " ", "precision"}], "]"}]}]}],
+          "]"}]}], ";", "\n", "    ", 
+       RowBox[{"px", " ", "=", " ", 
+        RowBox[{
+         RowBox[{"-", 
+          RowBox[{"(", 
+           RowBox[{"1", "/", 
+            RowBox[{"(", 
+             RowBox[{"nxSquared", " ", "+", " ", "nySquared"}], ")"}]}], 
+           ")"}]}], " ", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"SetPrecision", "[", 
+             RowBox[{"constZ", ",", " ", "precision"}], "]"}], " ", "nx", " ",
+             "nz"}], " ", "+", " ", 
+           RowBox[{"sTilde", " ", "ny"}]}], ")"}]}]}], ";", "\n", "    ", 
+       RowBox[{"py", " ", "=", " ", 
+        RowBox[{
+         RowBox[{"-", 
+          RowBox[{"(", 
+           RowBox[{"1", "/", 
+            RowBox[{"(", 
+             RowBox[{"nxSquared", " ", "+", " ", "nySquared"}], ")"}]}], 
+           ")"}]}], " ", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"SetPrecision", "[", 
+             RowBox[{"constZ", ",", " ", "precision"}], "]"}], " ", "ny", " ",
+             "nz"}], " ", "-", " ", 
+           RowBox[{"sTilde", " ", "nx"}]}], ")"}]}]}], ";", "\n", "    ", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"SetPrecision", "[", 
+          RowBox[{"px", ",", " ", "precision"}], "]"}], ",", " ", 
+         RowBox[{"SetPrecision", "[", 
+          RowBox[{"py", ",", " ", "precision"}], "]"}], ",", " ", 
+         RowBox[{"SetPrecision", "[", 
+          RowBox[{"constZ", ",", " ", "precision"}], "]"}]}], "}"}]}]}], "\n",
+      "  ", "]"}]}], ";"}], "\n", "  ", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Define", " ", "a", " ", "function", " ", "to", " ", "compute", " ", "the",
+     " ", "relative", " ", "error", " ", "with", " ", "adjustable", " ", 
+    "precision"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "relativeError", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"relativeError", "[", 
+     RowBox[{
+     "baseline_", ",", " ", "comparison_", ",", " ", "constZ_", ",", " ", 
+      "precision_"}], "]"}], " ", ":=", " ", 
+    RowBox[{"Module", "[", "\n", "  ", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "diff", ",", " ", "nom", ",", " ", "relError", ",", " ", 
+        "baselineSetPrec", ",", " ", "comparisonSetPrec", ",", " ", 
+        "constZSetPrec"}], "}"}], ",", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Ensure", " ", "inputs", " ", "are", " ", "treated", " ", "with", " ", 
+        "specified", " ", "precision"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{
+       RowBox[{"baselineSetPrec", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{"baseline", ",", " ", "precision"}], "]"}]}], ";", "\n", 
+       "  ", 
+       RowBox[{"comparisonSetPrec", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{"comparison", ",", " ", "precision"}], "]"}]}], ";", "\n", 
+       "  ", 
+       RowBox[{"constZSetPrec", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{"constZ", ",", " ", "precision"}], "]"}]}], ";", "\n", "  ", 
+       "\n", "  ", 
+       RowBox[{"diff", " ", "=", " ", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"baselineSetPrec", " ", "-", " ", "comparisonSetPrec"}], 
+          ")"}], "^", "2"}]}], ";", "  ", 
+       RowBox[{"(*", " ", 
+        RowBox[{"Calculate", " ", "squared", " ", "differences"}], " ", 
+        "*)"}], "\n", "  ", 
+       RowBox[{"nom", " ", "=", " ", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"baselineSetPrec", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], "^", "2"}], " ", "+", " ", 
+         RowBox[{
+          RowBox[{"baselineSetPrec", "[", 
+           RowBox[{"[", "2", "]"}], "]"}], "^", "2"}], " ", "+", " ", 
+         RowBox[{"constZSetPrec", "^", "2"}]}]}], ";", "  ", 
+       RowBox[{"(*", " ", 
+        RowBox[{"Calculate", " ", "the", " ", "norm", " ", "squared"}], " ", 
+        "*)"}], "\n", "  ", "\n", "  ", 
+       RowBox[{"(*", " ", 
+        RowBox[{
+        "Calculate", " ", "relative", " ", "error", " ", "with", " ", 
+         "specified", " ", "precision"}], " ", "*)"}], "\n", "  ", 
+       RowBox[{"relError", " ", "=", " ", 
+        RowBox[{"Sqrt", "[", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"diff", "[", 
+             RowBox[{"[", "1", "]"}], "]"}], " ", "+", " ", 
+            RowBox[{"diff", "[", 
+             RowBox[{"[", "2", "]"}], "]"}]}], ")"}], " ", "/", " ", "nom"}], 
+         "]"}]}], ";", "\n", "  ", 
+       RowBox[{"N", "[", 
+        RowBox[{"relError", ",", " ", "precision"}], "]"}]}]}], "  ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Ensure", " ", "final", " ", "result", " ", "is", " ", "returned", " ", 
+       "with", " ", "specified", " ", "precision"}], " ", "*)"}], "\n", 
+     "]"}]}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Define", " ", "a", " ", "function", " ", "to", " ", "format", " ", "the", 
+    " ", "latitude", " ", "similar", " ", "to", " ", "your", " ", 
+    RowBox[{"C", "++"}], " ", "function"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "formatLatitude", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"formatLatitude", "[", "lat_", "]"}], " ", ":=", " ", "\n", "  ", 
+    
+    RowBox[{"StringReplace", "[", "\n", "    ", 
+     RowBox[{
+      RowBox[{"ToString", "[", 
+       RowBox[{"NumberForm", "[", 
+        RowBox[{
+         RowBox[{"N", "[", "lat", "]"}], ",", " ", 
+         RowBox[{"{", 
+          RowBox[{"Infinity", ",", " ", "6"}], "}"}], ",", " ", 
+         RowBox[{"ExponentFunction", " ", "->", " ", 
+          RowBox[{"(", 
+           RowBox[{"Null", " ", "&"}], ")"}]}]}], "]"}], "]"}], ",", " ", 
+      "\n", "    ", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"\"\<.\>\"", " ", "->", " ", "\"\<_\>\""}], ",", " ", 
+        RowBox[{"\"\< \>\"", " ", "->", " ", "\"\<\>\""}]}], "}"}]}], "]"}]}],
+    ";"}], " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Removes", " ", "any", " ", "spaces", " ", "that", " ", "NumberForm", " ", 
+    "might", " ", "add"}], " ", "*)"}], "\n", "   ", "\n", "   ", "\n", 
+  "   "}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "importAndReconstructArcs", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"importAndReconstructArcs", "[", "arcFilePath_", "]"}], " ", ":=",
+     " ", 
+    RowBox[{"Module", "[", "\n", "    ", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"data", ",", " ", "reconstructedData"}], "}"}], ",", "\n", 
+      "\n", "    ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+        RowBox[{"Import", " ", "the", " ", "CSV", " ", "data"}], ",", " ", 
+        RowBox[{"skipping", " ", "the", " ", "header"}]}], " ", "*)"}], "\n", 
+      "    ", 
+      RowBox[{
+       RowBox[{"data", " ", "=", " ", 
+        RowBox[{"Import", "[", 
+         RowBox[{"arcFilePath", ",", " ", "\"\<CSV\>\"", ",", " ", 
+          RowBox[{"\"\<HeaderLines\>\"", " ", "->", " ", "1"}]}], "]"}]}], 
+       ";", "\n", "\n", "    ", 
+       RowBox[{"(*", " ", 
+        RowBox[{
+        "Reconstruct", " ", "the", " ", "doubles", " ", "from", " ", "the", 
+         " ", "significand", " ", "and", " ", "exponent", " ", "pairs"}], " ",
+         "*)"}], "\n", "    ", 
+       RowBox[{"reconstructedData", " ", "=", " ", 
+        RowBox[{"data", " ", "/.", " ", 
+         RowBox[{"{", "\n", "        ", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+            "axs_", ",", " ", "axe_", ",", " ", "ays_", ",", " ", "aye_", ",",
+              " ", "azs_", ",", " ", "aze_", ",", " ", "bxs_", ",", " ", 
+             "bxe_", ",", " ", "bys_", ",", " ", "bye_", ",", " ", "bzs_", 
+             ",", " ", "bze_", ",", " ", "czs_", ",", " ", "cze_"}], "}"}], 
+           " ", ":>", " ", 
+           RowBox[{"{", "\n", "            ", 
+            RowBox[{
+             RowBox[{"axs", " ", "*", " ", 
+              RowBox[{"2", "^", "axe"}]}], ",", " ", 
+             RowBox[{"ays", " ", "*", " ", 
+              RowBox[{"2", "^", "aye"}]}], ",", " ", 
+             RowBox[{"azs", " ", "*", " ", 
+              RowBox[{"2", "^", "aze"}]}], ",", "  ", 
+             RowBox[{"(*", " ", 
+              RowBox[{
+               RowBox[{"Point", " ", "A", " ", "x"}], ",", " ", "y", ",", " ",
+                "z"}], " ", "*)"}], "\n", "            ", 
+             RowBox[{"bxs", " ", "*", " ", 
+              RowBox[{"2", "^", "bxe"}]}], ",", " ", 
+             RowBox[{"bys", " ", "*", " ", 
+              RowBox[{"2", "^", "bye"}]}], ",", " ", 
+             RowBox[{"bzs", " ", "*", " ", 
+              RowBox[{"2", "^", "bze"}]}], ",", "  ", 
+             RowBox[{"(*", " ", 
+              RowBox[{
+               RowBox[{"Point", " ", "B", " ", "x"}], ",", " ", "y", ",", " ",
+                "z"}], " ", "*)"}], "\n", "            ", 
+             RowBox[{"czs", " ", "*", " ", 
+              RowBox[{"2", "^", "cze"}]}]}], "                            ", 
+            RowBox[{"(*", " ", 
+             RowBox[{"Const", " ", "Z"}], " ", "*)"}], "\n", "        ", 
+            "}"}]}], "\n", "    ", "}"}]}]}], ";", "\n", "\n", "    ", 
+       RowBox[{"(*", " ", 
+        RowBox[{"Return", " ", "reconstructed", " ", "data"}], " ", "*)"}], 
+       "\n", "    ", "reconstructedData"}]}], "\n", "]"}]}], ";"}], 
+  "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"ClearAll", "[", 
+    RowBox[{"importAndProcessBenchmarkData", ",", " ", "reconstruct"}], "]"}],
+    ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Helper", " ", "function", " ", "to", " ", "reconstruct", " ", "numbers", 
+    " ", "from", " ", "significand", " ", "and", " ", "exponent"}], " ", 
+   "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"reconstruct", "[", 
+     RowBox[{"significand_", ",", " ", "exponent_"}], "]"}], " ", ":=", " ", 
+    RowBox[{"significand", " ", "*", " ", 
+     RowBox[{"2", "^", "exponent"}]}]}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Main", " ", "function", " ", "to", " ", "import", " ", "and", " ", 
+    "process", " ", "CGAL", " ", "results"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+   "importAndProcessCGALBenchmarkData", "[", "cgalResultsFile_", "]"}], " ", ":=",
+    " ", 
+   RowBox[{"Module", "[", "\n", "    ", 
+    RowBox[{
+     RowBox[{"{", "cgalData", "}"}], ",", "\n", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+       RowBox[{"Import", " ", "the", " ", "data"}], ",", " ", 
+       RowBox[{"skip", " ", "the", " ", "header"}], ",", " ", 
+       RowBox[{"and", " ", "reconstruct", " ", "the", " ", "numbers"}]}], " ",
+       "*)"}], "\n", "    ", 
+     RowBox[{
+      RowBox[{"cgalData", " ", "=", " ", 
+       RowBox[{"Rest", "@", 
+        RowBox[{"Import", "[", "cgalResultsFile", "]"}]}]}], ";", "\n", "\n", 
+      "    ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Apply", " ", "the", " ", "reconstruct", " ", "function", " ", "to", 
+        " ", "each", " ", "set", " ", "of", " ", "values"}], " ", "*)"}], 
+      "\n", "    ", 
+      RowBox[{"cgalData", " ", "=", " ", 
+       RowBox[{"Map", "[", "\n", "        ", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"reconstruct", " ", "@@@", " ", 
+           RowBox[{"Partition", "[", 
+            RowBox[{"#", ",", " ", "2"}], "]"}]}], " ", "&"}], ",", "\n", 
+         "        ", "cgalData"}], "\n", "    ", "]"}]}], ";", "\n", "\n", 
+      "    ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Return", " ", "as", " ", "an", " ", "association", " ", "for", " ", 
+        "clarity"}], " ", "*)"}], "\n", "    ", 
+      RowBox[{"<|", 
+       RowBox[{"\"\<CGALResults\>\"", " ", "->", " ", "cgalData"}], 
+       "|>"}]}]}], "\n", "]"}]}], "\n", "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"ClearAll", "[", 
+    RowBox[{
+    "analyzeErrors", ",", " ", "computeBaselineResults", ",", " ", 
+     "computeRelativeErrors"}], "]"}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Helper", " ", "function", " ", "to", " ", "compute", " ", "baseline", " ",
+     "results"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"computeBaselineResults", "[", 
+     RowBox[{"arcData_", ",", " ", "analysisPrecision_"}], "]"}], " ", ":=", 
+    " ", "\n", "  ", 
+    RowBox[{"Table", "[", "\n", "    ", 
+     RowBox[{
+      RowBox[{"With", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"pointA", " ", "=", " ", 
+           RowBox[{"arc", "[", 
+            RowBox[{"[", 
+             RowBox[{"1", " ", ";;", " ", "3"}], "]"}], "]"}]}], ",", " ", 
+          RowBox[{"pointB", " ", "=", " ", 
+           RowBox[{"arc", "[", 
+            RowBox[{"[", 
+             RowBox[{"4", " ", ";;", " ", "6"}], "]"}], "]"}]}], ",", " ", 
+          RowBox[{"constZ", " ", "=", " ", 
+           RowBox[{"arc", "[", 
+            RowBox[{"[", "7", "]"}], "]"}]}]}], "}"}], ",", "\n", "      ", 
+        RowBox[{"gcaConstLatIntersectionCoordinatesNewEqn", "[", 
+         RowBox[{
+         "pointA", ",", " ", "pointB", ",", " ", "constZ", ",", " ", 
+          "analysisPrecision"}], "]"}]}], "\n", "    ", "]"}], ",", "\n", 
+      "    ", 
+      RowBox[{"{", 
+       RowBox[{"arc", ",", " ", "arcData"}], "}"}]}], "\n", "  ", "]"}]}], 
+   ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Helper", " ", "function", " ", "to", " ", "compute", " ", "relative", " ",
+     "errors"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"computeRelativeErrors", "[", 
+     RowBox[{
+     "baselineResults_", ",", " ", "benchmarkResults_", ",", " ", 
+      "analysisPrecision_"}], "]"}], " ", ":=", " ", "\n", "  ", 
+    RowBox[{"Table", "[", "\n", "    ", 
+     RowBox[{
+      RowBox[{"relativeError", "[", "\n", "      ", 
+       RowBox[{
+        RowBox[{"baselineResults", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", ",", " ", 
+           RowBox[{"1", " ", ";;", " ", "2"}]}], "]"}], "]"}], ",", " ", 
+        RowBox[{"benchmarkResults", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", ",", " ", 
+           RowBox[{"1", " ", ";;", " ", "2"}]}], "]"}], "]"}], ",", " ", "\n",
+         "      ", 
+        RowBox[{"baselineResults", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", ",", " ", "3"}], "]"}], "]"}], ",", " ", 
+        "analysisPrecision"}], "\n", "    ", "]"}], ",", "\n", "    ", 
+      RowBox[{"{", 
+       RowBox[{"i", ",", " ", 
+        RowBox[{"Length", "[", "baselineResults", "]"}]}], "}"}]}], "\n", 
+     "  ", "]"}]}], ";"}], "\n", "  ", "\n", "  "}], "\n", 
+ RowBox[{" ", 
+  RowBox[{
+   RowBox[{"summarizeData", "[", "data_", "]"}], " ", ":=", " ", 
+   RowBox[{"Max", "[", "data", "]"}]}], " ", "\n", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"summarizeData", "[", "data_", "]"}], " ", ":=", " ", 
+    RowBox[{"Quantile", "[", 
+     RowBox[{"data", ",", " ", "0.99"}], "]"}]}], "*)"}], "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Main", " ", "function", " ", "to", " ", "analyze", " ", "errors"}], " ", 
+   "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"analyzeKrummErrors", "[", 
+    RowBox[{
+    "arcData_", ",", " ", "benchmarkData_", ",", " ", "analysisPrecision_"}], 
+    "]"}], " ", ":=", " ", "\n", " ", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "baselineResults", ",", " ", "cgalFirstErrors", ",", " ", 
+       "cgalSecondErrors", ",", " ", "\n", "   ", "cgalErrors", ",", " ", 
+       "meanCgalErrors", ",", " ", "realIndices"}], "}"}], ",", "\n", "\n", 
+     "  ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Compute", " ", "baseline", " ", "results"}], " ", "*)"}], "\n",
+      "  ", 
+     RowBox[{
+      RowBox[{"baselineResults", " ", "=", " ", 
+       RowBox[{"computeBaselineResults", "[", 
+        RowBox[{"arcData", ",", " ", "analysisPrecision"}], "]"}]}], ";", 
+      "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Compute", " ", "first", " ", "point", " ", "relative", " ", "errors", 
+        " ", "for", " ", "CGAL", " ", "results"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"cgalFirstErrors", " ", "=", " ", "\n", "   ", 
+       RowBox[{"computeRelativeErrors", "[", 
+        RowBox[{"baselineResults", ",", " ", "\n", "    ", 
+         RowBox[{
+          RowBox[{"benchmarkData", "[", "\"\<CGALResults\>\"", "]"}], "[", 
+          RowBox[{"[", 
+           RowBox[{"All", ",", " ", 
+            RowBox[{"1", " ", ";;", " ", "2"}]}], "]"}], "]"}], ",", " ", 
+         "analysisPrecision"}], "]"}]}], ";", "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Compute", " ", "second", " ", "point", " ", "relative", " ", "errors",
+         " ", "for", " ", "CGAL", " ", "results"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"cgalSecondErrors", " ", "=", " ", "\n", "   ", 
+       RowBox[{"computeRelativeErrors", "[", 
+        RowBox[{"baselineResults", ",", " ", "\n", "    ", 
+         RowBox[{
+          RowBox[{"benchmarkData", "[", "\"\<CGALResults\>\"", "]"}], "[", 
+          RowBox[{"[", 
+           RowBox[{"All", ",", " ", 
+            RowBox[{"3", " ", ";;", " ", "4"}]}], "]"}], "]"}], ",", " ", 
+         "analysisPrecision"}], "]"}]}], ";", "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Identify", " ", "indices", " ", "where", " ", "both", " ", 
+        "cgalFirstErrors", " ", "and", " ", "cgalSecondErrors", " ", "are", 
+        " ", "real", " ", "numbers"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"realIndices", " ", "=", " ", "\n", "   ", 
+       RowBox[{"Select", "[", 
+        RowBox[{
+         RowBox[{"Range", "[", 
+          RowBox[{"Length", "[", "cgalFirstErrors", "]"}], "]"}], ",", " ", 
+         "\n", "    ", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Element", "[", 
+            RowBox[{
+             RowBox[{"cgalFirstErrors", "[", 
+              RowBox[{"[", "#", "]"}], "]"}], ",", " ", "Reals"}], "]"}], " ",
+            "&&", " ", "\n", "      ", 
+           RowBox[{"Element", "[", 
+            RowBox[{
+             RowBox[{"cgalSecondErrors", "[", 
+              RowBox[{"[", "#", "]"}], "]"}], ",", " ", "Reals"}], "]"}]}], 
+          " ", "&"}]}], "]"}]}], ";", "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+        RowBox[{"Keep", " ", "only", " ", "real"}], "-", 
+        RowBox[{
+        "valued", " ", "elements", " ", "in", " ", "cgalFirstErrors", " ", 
+         "and", " ", "cgalSecondErrors"}]}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"cgalFirstErrors", " ", "=", " ", 
+       RowBox[{"cgalFirstErrors", "[", 
+        RowBox[{"[", "realIndices", "]"}], "]"}]}], ";", "\n", "  ", 
+      RowBox[{"cgalSecondErrors", " ", "=", " ", 
+       RowBox[{"cgalSecondErrors", "[", 
+        RowBox[{"[", "realIndices", "]"}], "]"}]}], ";", "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Compute", " ", "the", " ", "minimum", " ", "relative", " ", "error", 
+        " ", "between", " ", "first", " ", "and", " ", "second", " ", 
+        "points"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"cgalErrors", " ", "=", " ", 
+       RowBox[{"MapThread", "[", 
+        RowBox[{"Min", ",", " ", 
+         RowBox[{"{", 
+          RowBox[{"cgalFirstErrors", ",", " ", "cgalSecondErrors"}], "}"}]}], 
+        "]"}]}], ";", "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Compute", " ", "the", " ", "mean", " ", "CGAL", " ", "errors"}], " ", 
+       "*)"}], "\n", "  ", 
+      RowBox[{"meanCgalErrors", " ", "=", " ", 
+       RowBox[{"summarizeData", "[", "cgalErrors", "]"}]}], ";", "\n", "\n", 
+      "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Combine", " ", "results", " ", "into", " ", "an", " ", 
+        "association"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"<|", 
+       RowBox[{
+       "\"\<KrummMethodErrors\>\"", " ", "->", " ", "meanCgalErrors"}], 
+       "|>"}]}]}], "\n", "]"}]}], "\n", "\n", "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"analysisPrecision", "=", "1000"}], ";"}], "\n", "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"outputDirectory", " ", "=", " ", 
+    RowBox[{"absolutePath", " ", "<>", " ", "\"\<mathematica_data/\>\""}]}], 
+   ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Create", " ", "CSV", " ", "data", " ", "list", " ", "holders"}], 
+   " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"cgalErrorsList", " ", "=", " ", 
+    RowBox[{"{", "}"}]}], ";"}], "\n", "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"For", "[", 
+    RowBox[{
+     RowBox[{"i", " ", "=", " ", "1"}], ",", " ", 
+     RowBox[{"i", " ", "<", " ", 
+      RowBox[{"Length", "[", "latitudePoints", "]"}]}], ",", " ", 
+     RowBox[{"i", "++"}], ",", "\n", "  ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Format", " ", "start", " ", "and", " ", "end", " ", "latitudes"}], " ",
+       "*)"}], "\n", "  ", 
+     RowBox[{
+      RowBox[{"startLatStr", " ", "=", " ", 
+       RowBox[{"formatLatitude", "[", 
+        RowBox[{"latitudePoints", "[", 
+         RowBox[{"[", "i", "]"}], "]"}], "]"}]}], ";", "\n", "  ", 
+      RowBox[{"endLatStr", " ", "=", " ", 
+       RowBox[{"formatLatitude", "[", 
+        RowBox[{"latitudePoints", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", " ", "+", " ", "1"}], "]"}], "]"}], "]"}]}], ";", "\n",
+       "  ", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{"Generate", " ", "filenames", " ", "with", " ", "precision"}], 
+       " ", "*)"}], "\n", "  ", 
+      RowBox[{"latRangeStr", " ", "=", " ", 
+       RowBox[{
+       "startLatStr", " ", "<>", " ", "\"\<_\>\"", " ", "<>", " ", 
+        "endLatStr"}]}], ";", "\n", "  ", 
+      RowBox[{"arcFilename", " ", "=", " ", 
+       RowBox[{"latRangeStr", " ", "<>", " ", "\"\<Arcs_Exponent.csv\>\""}]}],
+       ";", "\n", "  ", 
+      RowBox[{"benchmarkCGALFilename", " ", "=", " ", 
+       RowBox[{"latRangeStr", " ", "<>", " ", "\"\<_krumm_double.csv\>\""}]}],
+       ";", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Construct", " ", "the", " ", "full", " ", "paths", " ", "to", " ", 
+        "the", " ", "files", " ", "and", " ", "import", " ", "data"}], " ", 
+       "*)"}], "\n", "  ", 
+      RowBox[{"arcData", " ", "=", " ", 
+       RowBox[{"importAndReconstructArcs", "[", 
+        RowBox[{
+        "absolutePath", " ", "<>", " ", "\"\<generated_arcs/\>\"", " ", "<>", 
+         " ", "arcFilename"}], "]"}]}], ";", "\n", "  ", "\n", "  ", 
+      RowBox[{"benchmarkData", " ", "=", " ", 
+       RowBox[{"importAndProcessCGALBenchmarkData", "[", 
+        RowBox[{
+        "absolutePath", " ", "<>", " ", "\"\<benchmark_results/\>\"", " ", "<>",
+          " ", "benchmarkCGALFilename"}], "]"}]}], ";", "\n", "  ", 
+      RowBox[{"errorAnalysisResults", " ", "=", " ", 
+       RowBox[{"analyzeKrummErrors", "[", 
+        RowBox[{
+        "arcData", ",", " ", "benchmarkData", ",", " ", "analysisPrecision"}],
+         "]"}]}], ";", "\n", "    ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Calculate", " ", "midpoint", " ", "of", " ", "the", " ", "latitude", 
+        " ", "range"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"latitudeRangeMidpoint", " ", "=", " ", 
+       RowBox[{"N", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"latitudePoints", "[", 
+             RowBox[{"[", "i", "]"}], "]"}], " ", "+", " ", 
+            RowBox[{"latitudePoints", "[", 
+             RowBox[{"[", 
+              RowBox[{"i", " ", "+", " ", "1"}], "]"}], "]"}]}], ")"}], "/", 
+          "2"}], ",", " ", "analysisPrecision"}], "]"}]}], ";", "\n", "  ", 
+      "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{"Append", " ", "results", " ", "to", " ", "lists"}], " ", 
+       "*)"}], "\n", "  ", 
+      RowBox[{"AppendTo", "[", 
+       RowBox[{"cgalErrorsList", ",", " ", 
+        RowBox[{"{", 
+         RowBox[{"latitudeRangeMidpoint", ",", " ", 
+          RowBox[{
+          "errorAnalysisResults", "[", "\"\<KrummMethodErrors\>\"", "]"}]}], 
+         "}"}]}], "]"}], ";"}]}], "\n", "]"}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Export", " ", "results", " ", "to", " ", "CSV"}], " ", 
+   "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Export", "[", 
+    RowBox[{
+     RowBox[{
+     "outputDirectory", " ", "<>", " ", "\"\<Krumm_Relative_Error.csv\>\""}], 
+     ",", " ", "cgalErrorsList", ",", " ", "\"\<CSV\>\""}], "]"}], ";"}], 
+  "\n", "\n"}], "\n", 
+ RowBox[{
+  RowBox[{"Print", "[", "\"\<Done CSV Writing\>\"", "]"}], 
+  ";"}], "\n"}], "Code",
+ CellChangeTimes->{{3.937860205853768*^9, 3.9378603509187*^9}, {
+   3.937860803070707*^9, 3.937861010865582*^9}, 3.937861315508381*^9, {
+   3.937861367541531*^9, 3.937861419258157*^9}, {3.9378667864662867`*^9, 
+   3.9378670760707827`*^9}, {3.937867448784759*^9, 3.937867487097208*^9}, {
+   3.937867664874879*^9, 3.937867697311214*^9}, {3.939069263969297*^9, 
+   3.939069288922838*^9}, {3.939069329575094*^9, 3.9390693608509483`*^9}, 
+   3.939069436432494*^9, 3.939069596542202*^9, 3.939071834164428*^9, {
+   3.939218865136642*^9, 3.939218884133972*^9}, {3.942439412585376*^9, 
+   3.942439438904216*^9}, {3.942451391495512*^9, 3.942451402455426*^9}, 
+   3.943321635450931*^9, 3.943321713069394*^9, {3.943323049300608*^9, 
+   3.943323050305253*^9}, {3.94970639265493*^9, 3.949706475131158*^9}, {
+   3.94970652568894*^9, 3.949706544158944*^9}, {3.9497066146875877`*^9, 
+   3.949706711772484*^9}},ExpressionUUID->"d2f9db98-27e3-497e-97de-\
+f95456afa66c"],
+
+Cell[BoxData["\<\"/Users/hongyuchen/Desktop/UCDavis/Stuffs/pythonProject/\"\>\
+"], "Output",
+ CellChangeTimes->{3.937867872194482*^9, 3.937874357977425*^9, 
+  3.939069404208104*^9, 3.939069451320003*^9, 3.939069682990721*^9, 
+  3.939070566844563*^9, 3.939070922803173*^9, 3.939071835498439*^9, 
+  3.9392168127942133`*^9, 3.939218906037755*^9, 3.942439448484584*^9, 
+  3.942450438037324*^9, 3.9424514053941913`*^9, 3.943321639825729*^9, 
+  3.943322303157075*^9, 3.943323074962551*^9},
+ CellLabel->"Out[68]=",ExpressionUUID->"3bccdb37-b4e8-469d-9f8d-8df1f2c0d545"],
+
+Cell[BoxData["\<\"Done CSV Writing\"\>"], "Print",
+ CellChangeTimes->{3.9433227441876507`*^9, 3.943323521627249*^9},
+ CellLabel->
+  "During evaluation of \
+In[66]:=",ExpressionUUID->"aa16cfe2-e1cf-4fb1-a0c1-73c389ff8fd1"]
+}, Open  ]],
+
+Cell["Arc Up Cases", "Text",
+ CellChangeTimes->{{3.9416477898977213`*^9, 
+  3.94164779303927*^9}},ExpressionUUID->"f7d09dac-a08c-404b-a0b9-\
+dd72cf830152"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"startOffset", " ", "=", " ", "0.01"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"endOffset", " ", "=", " ", 
+   RowBox[{"10", "^", 
+    RowBox[{"-", "14"}]}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"stepSize", " ", "=", " ", "10"}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Generate", " ", "the", " ", "array"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"offsets", " ", "=", " ", 
+   RowBox[{"NestWhileList", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"#", "/", "stepSize"}], " ", "&"}], ",", " ", "startOffset", 
+     ",", " ", 
+     RowBox[{
+      RowBox[{"#", " ", ">=", " ", "endOffset"}], " ", "&"}]}], "]"}]}], 
+  "\n"}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "absolutePath", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+  "absolutePath", " ", "=", " ", 
+   "\"\</Users/hongyuchen/Desktop/UCDavis/Stuffs/pythonProject/\>\""}], "\n", 
+  "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Convert", " ", "latitude", " ", "and", " ", "longitude", " ", "to", " ", 
+    "Cartesian", " ", "coordinates", " ", "on", " ", "a", " ", "unit", " ", 
+    "sphere"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "latLonToXYZ", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"latLonToXYZ", "[", 
+     RowBox[{"lat_", ",", " ", "lon_"}], "]"}], " ", ":=", " ", "\n", "  ", 
+    RowBox[{"With", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"\[Theta]", " ", "=", " ", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"90", " ", "-", " ", "lat"}], ")"}], " ", "Degree"}]}], 
+        ",", " ", 
+        RowBox[{"\[CurlyPhi]", " ", "=", " ", 
+         RowBox[{"lon", " ", "Degree"}]}]}], "}"}], ",", "\n", "    ", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Sin", "[", "\[Theta]", "]"}], " ", 
+         RowBox[{"Cos", "[", "\[CurlyPhi]", "]"}]}], ",", " ", 
+        RowBox[{
+         RowBox[{"Sin", "[", "\[Theta]", "]"}], " ", 
+         RowBox[{"Sin", "[", "\[CurlyPhi]", "]"}]}], ",", " ", 
+        RowBox[{"Cos", "[", "\[Theta]", "]"}]}], "}"}]}], "\n", "  ", "]"}]}],
+    ";"}], "\n", "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Check", " ", "if", " ", "the", " ", "span", " ", "is", " ", "within", " ",
+     "the", " ", "given", " ", "tolerance"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "isSpanCorrect", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"isSpanCorrect", "[", 
+     RowBox[{
+     "startPoint_", ",", " ", "endPoint_", ",", " ", "spanRadians_", ",", " ",
+       "toleranceRadians_"}], "]"}], " ", ":=", " ", "\n", "  ", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "arcLength", "}"}], ",", "\n", "    ", 
+      RowBox[{
+       RowBox[{"arcLength", " ", "=", " ", 
+        RowBox[{"ArcCos", "[", 
+         RowBox[{
+          RowBox[{"Normalize", "[", "startPoint", "]"}], " ", ".", " ", 
+          RowBox[{"Normalize", "[", "endPoint", "]"}]}], "]"}]}], ";", "\n", 
+       "    ", 
+       RowBox[{"arcLength", " ", "<=", " ", 
+        RowBox[{"spanRadians", " ", "+", " ", "toleranceRadians"}]}]}]}], 
+     "\n", "  ", "]"}]}], ";"}], "\n", "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Function", " ", "to", " ", "generate", " ", "random", " ", "great", " ", 
+    "circle", " ", "arcs", " ", "with", " ", "a", " ", "specified", " ", 
+    "span"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "generateGreatCircleArcs", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"generateGreatCircleArcs", "[", 
+     RowBox[{
+     "numArcs_Integer", ",", " ", "latRange_List", ",", " ", "lonRange_List", 
+      ",", " ", 
+      RowBox[{"precision_", ":", " ", "MachinePrecision"}], ",", " ", 
+      RowBox[{"spanDegrees_", ":", " ", 
+       RowBox[{"-", "1.0"}]}], ",", " ", 
+      RowBox[{"toleranceDegrees_", ":", " ", "0.1"}]}], "]"}], " ", ":=", 
+    "\n", "  ", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"arcs", " ", "=", " ", 
+         RowBox[{"{", "}"}]}], ",", " ", "startPoint", ",", " ", "endPoint", 
+        ",", " ", "spanRadians", ",", " ", "toleranceRadians", ",", " ", 
+        "startLat", ",", " ", "startLon", ",", " ", "endLat", ",", " ", 
+        "endLon"}], "}"}], ",", "\n", "    ", 
+      RowBox[{
+       RowBox[{"spanRadians", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{"spanDegrees", " ", ">", " ", "0"}], ",", " ", 
+            RowBox[{"spanDegrees", " ", "Degree"}], ",", " ", "spanDegrees"}],
+            "]"}], ",", " ", "precision"}], "]"}]}], ";", "\n", "    ", 
+       RowBox[{"toleranceRadians", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{
+          RowBox[{"toleranceDegrees", " ", "Degree"}], ",", " ", 
+          "precision"}], "]"}]}], ";", "\n", "\n", "    ", 
+       RowBox[{"While", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Length", "[", "arcs", "]"}], " ", "<", " ", "numArcs"}], 
+         ",", "\n", "      ", 
+         RowBox[{
+          RowBox[{"startLat", " ", "=", " ", 
+           RowBox[{"RandomReal", "[", "latRange", "]"}]}], ";", "\n", 
+          "      ", 
+          RowBox[{"startLon", " ", "=", " ", 
+           RowBox[{"RandomReal", "[", "lonRange", "]"}]}], ";", "\n", 
+          "      ", 
+          RowBox[{"endLat", " ", "=", " ", 
+           RowBox[{"RandomReal", "[", "latRange", "]"}]}], ";", "\n", 
+          "      ", 
+          RowBox[{"endLon", " ", "=", " ", 
+           RowBox[{"RandomReal", "[", "lonRange", "]"}]}], ";", "\n", 
+          "      ", 
+          RowBox[{"startPoint", " ", "=", " ", 
+           RowBox[{"latLonToXYZ", "[", 
+            RowBox[{
+             RowBox[{"SetPrecision", "[", 
+              RowBox[{"startLat", ",", " ", "precision"}], "]"}], ",", " ", 
+             RowBox[{"SetPrecision", "[", 
+              RowBox[{"startLon", ",", " ", "precision"}], "]"}]}], "]"}]}], 
+          ";", "\n", "      ", 
+          RowBox[{"endPoint", " ", "=", " ", 
+           RowBox[{"latLonToXYZ", "[", 
+            RowBox[{
+             RowBox[{"SetPrecision", "[", 
+              RowBox[{"endLat", ",", " ", "precision"}], "]"}], ",", " ", 
+             RowBox[{"SetPrecision", "[", 
+              RowBox[{"endLon", ",", " ", "precision"}], "]"}]}], "]"}]}], 
+          ";", "\n", "\n", "      ", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"spanDegrees", " ", "<=", " ", "0"}], " ", "||", " ", 
+             RowBox[{"isSpanCorrect", "[", 
+              RowBox[{
+              "startPoint", ",", " ", "endPoint", ",", " ", "spanRadians", 
+               ",", " ", "toleranceRadians"}], "]"}]}], ",", "\n", "        ", 
+            RowBox[{"AppendTo", "[", 
+             RowBox[{"arcs", ",", " ", 
+              RowBox[{"{", 
+               RowBox[{"startPoint", ",", " ", "endPoint"}], "}"}]}], "]"}]}],
+            "\n", "      ", "]"}]}]}], "\n", "    ", "]"}], ";", "\n", "\n", 
+       "    ", "arcs"}]}], "\n", "]"}]}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Function", " ", "to", " ", "calculate", " ", "intersection", " ", 
+    "coordinates", " ", "with", " ", "a", " ", "specified", " ", 
+    "precision"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "gcaConstLatIntersectionCoordinatesNewEqn", "]"}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"gcaConstLatIntersectionCoordinatesNewEqn", "[", 
+     RowBox[{
+     "pointA_List", ",", " ", "pointB_List", ",", " ", "constZ_", ",", " ", 
+      RowBox[{"precision_", ":", " ", "MachinePrecision"}]}], "]"}], " ", ":=",
+     " ", "\n", "  ", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "n", ",", " ", "nx", ",", " ", "ny", ",", " ", "nz", ",", " ", 
+        "nxSquared", ",", " ", "nySquared", ",", " ", "nzSquared", ",", " ", 
+        "normNSquared", ",", " ", "sTilde", ",", " ", "px", ",", " ", "py"}], 
+       "}"}], ",", "\n", "    ", 
+      RowBox[{
+       RowBox[{"n", " ", "=", " ", 
+        RowBox[{"Cross", "[", 
+         RowBox[{"pointA", ",", " ", "pointB"}], "]"}]}], ";", "\n", "    ", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"nx", ",", " ", "ny", ",", " ", "nz"}], "}"}], " ", "=", " ",
+         "n"}], ";", "\n", "    ", 
+       RowBox[{"nxSquared", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{
+          RowBox[{"nx", "^", "2"}], ",", " ", "precision"}], "]"}]}], ";", 
+       "\n", "    ", 
+       RowBox[{"nySquared", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{
+          RowBox[{"ny", "^", "2"}], ",", " ", "precision"}], "]"}]}], ";", 
+       "\n", "    ", 
+       RowBox[{"nzSquared", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{
+          RowBox[{"nz", "^", "2"}], ",", " ", "precision"}], "]"}]}], ";", 
+       "\n", "    ", 
+       RowBox[{"normNSquared", " ", "=", " ", 
+        RowBox[{
+        "nxSquared", " ", "+", " ", "nySquared", " ", "+", " ", 
+         "nzSquared"}]}], " ", ";", "\n", "    ", 
+       RowBox[{"sTilde", " ", "=", " ", 
+        RowBox[{"Sqrt", "[", 
+         RowBox[{"nxSquared", " ", "+", " ", "nySquared", " ", "-", " ", 
+          RowBox[{"normNSquared", " ", 
+           RowBox[{"SetPrecision", "[", 
+            RowBox[{
+             RowBox[{"constZ", "^", "2"}], ",", " ", "precision"}], "]"}]}]}],
+          "]"}]}], ";", "\n", "    ", 
+       RowBox[{"px", " ", "=", " ", 
+        RowBox[{
+         RowBox[{"-", 
+          RowBox[{"(", 
+           RowBox[{"1", "/", 
+            RowBox[{"(", 
+             RowBox[{"nxSquared", " ", "+", " ", "nySquared"}], ")"}]}], 
+           ")"}]}], " ", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"SetPrecision", "[", 
+             RowBox[{"constZ", ",", " ", "precision"}], "]"}], " ", "nx", " ",
+             "nz"}], " ", "+", " ", 
+           RowBox[{"sTilde", " ", "ny"}]}], ")"}]}]}], ";", "\n", "    ", 
+       RowBox[{"py", " ", "=", " ", 
+        RowBox[{
+         RowBox[{"-", 
+          RowBox[{"(", 
+           RowBox[{"1", "/", 
+            RowBox[{"(", 
+             RowBox[{"nxSquared", " ", "+", " ", "nySquared"}], ")"}]}], 
+           ")"}]}], " ", 
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"SetPrecision", "[", 
+             RowBox[{"constZ", ",", " ", "precision"}], "]"}], " ", "ny", " ",
+             "nz"}], " ", "-", " ", 
+           RowBox[{"sTilde", " ", "nx"}]}], ")"}]}]}], ";", "\n", "    ", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"SetPrecision", "[", 
+          RowBox[{"px", ",", " ", "precision"}], "]"}], ",", " ", 
+         RowBox[{"SetPrecision", "[", 
+          RowBox[{"py", ",", " ", "precision"}], "]"}], ",", " ", 
+         RowBox[{"SetPrecision", "[", 
+          RowBox[{"constZ", ",", " ", "precision"}], "]"}]}], "}"}]}]}], "\n",
+      "  ", "]"}]}], ";"}], "\n", "  ", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Define", " ", "a", " ", "function", " ", "to", " ", "compute", " ", "the",
+     " ", "relative", " ", "error", " ", "with", " ", "adjustable", " ", 
+    "precision"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "relativeError", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"relativeError", "[", 
+     RowBox[{
+     "baseline_", ",", " ", "comparison_", ",", " ", "constZ_", ",", " ", 
+      "precision_"}], "]"}], " ", ":=", " ", 
+    RowBox[{"Module", "[", "\n", "  ", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "diff", ",", " ", "nom", ",", " ", "relError", ",", " ", 
+        "baselineSetPrec", ",", " ", "comparisonSetPrec", ",", " ", 
+        "constZSetPrec"}], "}"}], ",", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Ensure", " ", "inputs", " ", "are", " ", "treated", " ", "with", " ", 
+        "specified", " ", "precision"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{
+       RowBox[{"baselineSetPrec", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{"baseline", ",", " ", "precision"}], "]"}]}], ";", "\n", 
+       "  ", 
+       RowBox[{"comparisonSetPrec", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{"comparison", ",", " ", "precision"}], "]"}]}], ";", "\n", 
+       "  ", 
+       RowBox[{"constZSetPrec", " ", "=", " ", 
+        RowBox[{"SetPrecision", "[", 
+         RowBox[{"constZ", ",", " ", "precision"}], "]"}]}], ";", "\n", "  ", 
+       "\n", "  ", 
+       RowBox[{"diff", " ", "=", " ", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"baselineSetPrec", " ", "-", " ", "comparisonSetPrec"}], 
+          ")"}], "^", "2"}]}], ";", "  ", 
+       RowBox[{"(*", " ", 
+        RowBox[{"Calculate", " ", "squared", " ", "differences"}], " ", 
+        "*)"}], "\n", "  ", 
+       RowBox[{"nom", " ", "=", " ", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"baselineSetPrec", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], "^", "2"}], " ", "+", " ", 
+         RowBox[{
+          RowBox[{"baselineSetPrec", "[", 
+           RowBox[{"[", "2", "]"}], "]"}], "^", "2"}], " ", "+", " ", 
+         RowBox[{"constZSetPrec", "^", "2"}]}]}], ";", "  ", 
+       RowBox[{"(*", " ", 
+        RowBox[{"Calculate", " ", "the", " ", "norm", " ", "squared"}], " ", 
+        "*)"}], "\n", "  ", "\n", "  ", 
+       RowBox[{"(*", " ", 
+        RowBox[{
+        "Calculate", " ", "relative", " ", "error", " ", "with", " ", 
+         "specified", " ", "precision"}], " ", "*)"}], "\n", "  ", 
+       RowBox[{"relError", " ", "=", " ", 
+        RowBox[{"Sqrt", "[", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"diff", "[", 
+             RowBox[{"[", "1", "]"}], "]"}], " ", "+", " ", 
+            RowBox[{"diff", "[", 
+             RowBox[{"[", "2", "]"}], "]"}]}], ")"}], " ", "/", " ", "nom"}], 
+         "]"}]}], ";", "\n", "  ", 
+       RowBox[{"N", "[", 
+        RowBox[{"relError", ",", " ", "precision"}], "]"}]}]}], "  ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Ensure", " ", "final", " ", "result", " ", "is", " ", "returned", " ", 
+       "with", " ", "specified", " ", "precision"}], " ", "*)"}], "\n", 
+     "]"}]}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Define", " ", "a", " ", "function", " ", "to", " ", "format", " ", "the", 
+    " ", "latitude", " ", "similar", " ", "to", " ", "your", " ", 
+    RowBox[{"C", "++"}], " ", "function"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "formatLatitude", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"formatLatitude", "[", "lat_", "]"}], " ", ":=", " ", "\n", "  ", 
+    
+    RowBox[{"StringReplace", "[", "\n", "    ", 
+     RowBox[{
+      RowBox[{"ToString", "[", 
+       RowBox[{"NumberForm", "[", 
+        RowBox[{
+         RowBox[{"N", "[", "lat", "]"}], ",", " ", 
+         RowBox[{"{", 
+          RowBox[{"Infinity", ",", " ", "16"}], "}"}], ",", " ", 
+         RowBox[{"ExponentFunction", " ", "->", " ", 
+          RowBox[{"(", 
+           RowBox[{"Null", " ", "&"}], ")"}]}]}], "]"}], "]"}], ",", " ", 
+      "\n", "    ", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"\"\<.\>\"", " ", "->", " ", "\"\<_\>\""}], ",", " ", 
+        RowBox[{"\"\< \>\"", " ", "->", " ", "\"\<\>\""}]}], "}"}]}], "]"}]}],
+    ";"}], " ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Removes", " ", "any", " ", "spaces", " ", "that", " ", "NumberForm", " ", 
+    "might", " ", "add"}], " ", "*)"}], "\n", "   ", "\n", "   ", "\n", 
+  "   "}], "\n", 
+ RowBox[{
+  RowBox[{"ClearAll", "[", "importAndReconstructArcs", "]"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"importAndReconstructArcs", "[", "arcFilePath_", "]"}], " ", ":=",
+     " ", 
+    RowBox[{"Module", "[", "\n", "    ", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"data", ",", " ", "reconstructedData"}], "}"}], ",", "\n", 
+      "\n", "    ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+        RowBox[{"Import", " ", "the", " ", "CSV", " ", "data"}], ",", " ", 
+        RowBox[{"skipping", " ", "the", " ", "header"}]}], " ", "*)"}], "\n", 
+      "    ", 
+      RowBox[{
+       RowBox[{"data", " ", "=", " ", 
+        RowBox[{"Import", "[", 
+         RowBox[{"arcFilePath", ",", " ", "\"\<CSV\>\"", ",", " ", 
+          RowBox[{"\"\<HeaderLines\>\"", " ", "->", " ", "1"}]}], "]"}]}], 
+       ";", "\n", "\n", "    ", 
+       RowBox[{"(*", " ", 
+        RowBox[{
+        "Reconstruct", " ", "the", " ", "doubles", " ", "from", " ", "the", 
+         " ", "significand", " ", "and", " ", "exponent", " ", "pairs"}], " ",
+         "*)"}], "\n", "    ", 
+       RowBox[{"reconstructedData", " ", "=", " ", 
+        RowBox[{"data", " ", "/.", " ", 
+         RowBox[{"{", "\n", "        ", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+            "axs_", ",", " ", "axe_", ",", " ", "ays_", ",", " ", "aye_", ",",
+              " ", "azs_", ",", " ", "aze_", ",", " ", "bxs_", ",", " ", 
+             "bxe_", ",", " ", "bys_", ",", " ", "bye_", ",", " ", "bzs_", 
+             ",", " ", "bze_", ",", " ", "czs_", ",", " ", "cze_"}], "}"}], 
+           " ", ":>", " ", 
+           RowBox[{"{", "\n", "            ", 
+            RowBox[{
+             RowBox[{"axs", " ", "*", " ", 
+              RowBox[{"2", "^", "axe"}]}], ",", " ", 
+             RowBox[{"ays", " ", "*", " ", 
+              RowBox[{"2", "^", "aye"}]}], ",", " ", 
+             RowBox[{"azs", " ", "*", " ", 
+              RowBox[{"2", "^", "aze"}]}], ",", "  ", 
+             RowBox[{"(*", " ", 
+              RowBox[{
+               RowBox[{"Point", " ", "A", " ", "x"}], ",", " ", "y", ",", " ",
+                "z"}], " ", "*)"}], "\n", "            ", 
+             RowBox[{"bxs", " ", "*", " ", 
+              RowBox[{"2", "^", "bxe"}]}], ",", " ", 
+             RowBox[{"bys", " ", "*", " ", 
+              RowBox[{"2", "^", "bye"}]}], ",", " ", 
+             RowBox[{"bzs", " ", "*", " ", 
+              RowBox[{"2", "^", "bze"}]}], ",", "  ", 
+             RowBox[{"(*", " ", 
+              RowBox[{
+               RowBox[{"Point", " ", "B", " ", "x"}], ",", " ", "y", ",", " ",
+                "z"}], " ", "*)"}], "\n", "            ", 
+             RowBox[{"czs", " ", "*", " ", 
+              RowBox[{"2", "^", "cze"}]}]}], "                            ", 
+            RowBox[{"(*", " ", 
+             RowBox[{"Const", " ", "Z"}], " ", "*)"}], "\n", "        ", 
+            "}"}]}], "\n", "    ", "}"}]}]}], ";", "\n", "\n", "    ", 
+       RowBox[{"(*", " ", 
+        RowBox[{"Return", " ", "reconstructed", " ", "data"}], " ", "*)"}], 
+       "\n", "    ", "reconstructedData"}]}], "\n", "]"}]}], ";"}], 
+  "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"ClearAll", "[", 
+    RowBox[{"importAndProcessBenchmarkData", ",", " ", "reconstruct"}], "]"}],
+    ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Helper", " ", "function", " ", "to", " ", "reconstruct", " ", "numbers", 
+    " ", "from", " ", "significand", " ", "and", " ", "exponent"}], " ", 
+   "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"reconstruct", "[", 
+     RowBox[{"significand_", ",", " ", "exponent_"}], "]"}], " ", ":=", " ", 
+    RowBox[{"significand", " ", "*", " ", 
+     RowBox[{"2", "^", "exponent"}]}]}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Main", " ", "function", " ", "to", " ", "import", " ", "and", " ", 
+    "process", " ", "CGAL", " ", "results"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+   "importAndProcessCGALBenchmarkData", "[", "cgalResultsFile_", "]"}], " ", ":=",
+    " ", 
+   RowBox[{"Module", "[", "\n", "    ", 
+    RowBox[{
+     RowBox[{"{", "cgalData", "}"}], ",", "\n", "\n", "    ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+       RowBox[{"Import", " ", "the", " ", "data"}], ",", " ", 
+       RowBox[{"skip", " ", "the", " ", "header"}], ",", " ", 
+       RowBox[{"and", " ", "reconstruct", " ", "the", " ", "numbers"}]}], " ",
+       "*)"}], "\n", "    ", 
+     RowBox[{
+      RowBox[{"cgalData", " ", "=", " ", 
+       RowBox[{"Rest", "@", 
+        RowBox[{"Import", "[", "cgalResultsFile", "]"}]}]}], ";", "\n", "\n", 
+      "    ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Apply", " ", "the", " ", "reconstruct", " ", "function", " ", "to", 
+        " ", "each", " ", "set", " ", "of", " ", "values"}], " ", "*)"}], 
+      "\n", "    ", 
+      RowBox[{"cgalData", " ", "=", " ", 
+       RowBox[{"Map", "[", "\n", "        ", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"reconstruct", " ", "@@@", " ", 
+           RowBox[{"Partition", "[", 
+            RowBox[{"#", ",", " ", "2"}], "]"}]}], " ", "&"}], ",", "\n", 
+         "        ", "cgalData"}], "\n", "    ", "]"}]}], ";", "\n", "\n", 
+      "    ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Return", " ", "as", " ", "an", " ", "association", " ", "for", " ", 
+        "clarity"}], " ", "*)"}], "\n", "    ", 
+      RowBox[{"<|", 
+       RowBox[{"\"\<CGALResults\>\"", " ", "->", " ", "cgalData"}], 
+       "|>"}]}]}], "\n", "]"}]}], "\n", "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"ClearAll", "[", 
+    RowBox[{
+    "analyzeErrors", ",", " ", "computeBaselineResults", ",", " ", 
+     "computeRelativeErrors"}], "]"}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Helper", " ", "function", " ", "to", " ", "compute", " ", "baseline", " ",
+     "results"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"computeBaselineResults", "[", 
+     RowBox[{"arcData_", ",", " ", "analysisPrecision_"}], "]"}], " ", ":=", 
+    " ", "\n", "  ", 
+    RowBox[{"Table", "[", "\n", "    ", 
+     RowBox[{
+      RowBox[{"With", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"pointA", " ", "=", " ", 
+           RowBox[{"arc", "[", 
+            RowBox[{"[", 
+             RowBox[{"1", " ", ";;", " ", "3"}], "]"}], "]"}]}], ",", " ", 
+          RowBox[{"pointB", " ", "=", " ", 
+           RowBox[{"arc", "[", 
+            RowBox[{"[", 
+             RowBox[{"4", " ", ";;", " ", "6"}], "]"}], "]"}]}], ",", " ", 
+          RowBox[{"constZ", " ", "=", " ", 
+           RowBox[{"arc", "[", 
+            RowBox[{"[", "7", "]"}], "]"}]}]}], "}"}], ",", "\n", "      ", 
+        RowBox[{"gcaConstLatIntersectionCoordinatesNewEqn", "[", 
+         RowBox[{
+         "pointA", ",", " ", "pointB", ",", " ", "constZ", ",", " ", 
+          "analysisPrecision"}], "]"}]}], "\n", "    ", "]"}], ",", "\n", 
+      "    ", 
+      RowBox[{"{", 
+       RowBox[{"arc", ",", " ", "arcData"}], "}"}]}], "\n", "  ", "]"}]}], 
+   ";"}], "\n"}], "\n", 
+ RowBox[{" ", 
+  RowBox[{
+   RowBox[{"summarizeData", "[", "data_", "]"}], " ", ":=", " ", 
+   RowBox[{"Mean", "[", "data", "]"}]}], " ", "\n", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"summarizeData", "[", "data_", "]"}], " ", ":=", " ", 
+    RowBox[{"Quantile", "[", 
+     RowBox[{"data", ",", " ", "0.99"}], "]"}]}], "*)"}], "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Helper", " ", "function", " ", "to", " ", "compute", " ", "relative", " ",
+     "errors"}], " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"computeRelativeErrors", "[", 
+     RowBox[{
+     "baselineResults_", ",", " ", "benchmarkResults_", ",", " ", 
+      "analysisPrecision_"}], "]"}], " ", ":=", " ", "\n", "  ", 
+    RowBox[{"Table", "[", "\n", "    ", 
+     RowBox[{
+      RowBox[{"relativeError", "[", "\n", "      ", 
+       RowBox[{
+        RowBox[{"baselineResults", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", ",", " ", 
+           RowBox[{"1", " ", ";;", " ", "2"}]}], "]"}], "]"}], ",", " ", 
+        RowBox[{"benchmarkResults", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", ",", " ", 
+           RowBox[{"1", " ", ";;", " ", "2"}]}], "]"}], "]"}], ",", " ", "\n",
+         "      ", 
+        RowBox[{"baselineResults", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", ",", " ", "3"}], "]"}], "]"}], ",", " ", 
+        "analysisPrecision"}], "\n", "    ", "]"}], ",", "\n", "    ", 
+      RowBox[{"{", 
+       RowBox[{"i", ",", " ", 
+        RowBox[{"Length", "[", "baselineResults", "]"}]}], "}"}]}], "\n", 
+     "  ", "]"}]}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "Main", " ", "function", " ", "to", " ", "analyze", " ", "errors"}], " ", 
+   "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"analyzeKrummErrors", "[", 
+    RowBox[{
+    "arcData_", ",", " ", "benchmarkData_", ",", " ", "analysisPrecision_"}], 
+    "]"}], " ", ":=", " ", "\n", " ", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{
+      "baselineResults", ",", " ", "cgalFirstErrors", ",", " ", 
+       "cgalSecondErrors", ",", " ", "\n", "   ", "cgalErrors", ",", " ", 
+       "meanCgalErrors", ",", " ", "realIndices"}], "}"}], ",", "\n", "\n", 
+     "  ", 
+     RowBox[{"(*", " ", 
+      RowBox[{"Compute", " ", "baseline", " ", "results"}], " ", "*)"}], "\n",
+      "  ", 
+     RowBox[{
+      RowBox[{"baselineResults", " ", "=", " ", 
+       RowBox[{"computeBaselineResults", "[", 
+        RowBox[{"arcData", ",", " ", "analysisPrecision"}], "]"}]}], ";", 
+      "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Compute", " ", "first", " ", "point", " ", "relative", " ", "errors", 
+        " ", "for", " ", "CGAL", " ", "results"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"cgalFirstErrors", " ", "=", " ", "\n", "   ", 
+       RowBox[{"computeRelativeErrors", "[", 
+        RowBox[{"baselineResults", ",", " ", "\n", "    ", 
+         RowBox[{
+          RowBox[{"benchmarkData", "[", "\"\<CGALResults\>\"", "]"}], "[", 
+          RowBox[{"[", 
+           RowBox[{"All", ",", " ", 
+            RowBox[{"1", " ", ";;", " ", "2"}]}], "]"}], "]"}], ",", " ", 
+         "analysisPrecision"}], "]"}]}], ";", "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Compute", " ", "second", " ", "point", " ", "relative", " ", "errors",
+         " ", "for", " ", "CGAL", " ", "results"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"cgalSecondErrors", " ", "=", " ", "\n", "   ", 
+       RowBox[{"computeRelativeErrors", "[", 
+        RowBox[{"baselineResults", ",", " ", "\n", "    ", 
+         RowBox[{
+          RowBox[{"benchmarkData", "[", "\"\<CGALResults\>\"", "]"}], "[", 
+          RowBox[{"[", 
+           RowBox[{"All", ",", " ", 
+            RowBox[{"3", " ", ";;", " ", "4"}]}], "]"}], "]"}], ",", " ", 
+         "analysisPrecision"}], "]"}]}], ";", "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Identify", " ", "indices", " ", "where", " ", "both", " ", 
+        "cgalFirstErrors", " ", "and", " ", "cgalSecondErrors", " ", "are", 
+        " ", "real", " ", "numbers"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"realIndices", " ", "=", " ", "\n", "   ", 
+       RowBox[{"Select", "[", 
+        RowBox[{
+         RowBox[{"Range", "[", 
+          RowBox[{"Length", "[", "cgalFirstErrors", "]"}], "]"}], ",", " ", 
+         "\n", "    ", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Element", "[", 
+            RowBox[{
+             RowBox[{"cgalFirstErrors", "[", 
+              RowBox[{"[", "#", "]"}], "]"}], ",", " ", "Reals"}], "]"}], " ",
+            "&&", " ", "\n", "      ", 
+           RowBox[{"Element", "[", 
+            RowBox[{
+             RowBox[{"cgalSecondErrors", "[", 
+              RowBox[{"[", "#", "]"}], "]"}], ",", " ", "Reals"}], "]"}]}], 
+          " ", "&"}]}], "]"}]}], ";", "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+        RowBox[{"Keep", " ", "only", " ", "real"}], "-", 
+        RowBox[{
+        "valued", " ", "elements", " ", "in", " ", "cgalFirstErrors", " ", 
+         "and", " ", "cgalSecondErrors"}]}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"cgalFirstErrors", " ", "=", " ", 
+       RowBox[{"cgalFirstErrors", "[", 
+        RowBox[{"[", "realIndices", "]"}], "]"}]}], ";", "\n", "  ", 
+      RowBox[{"cgalSecondErrors", " ", "=", " ", 
+       RowBox[{"cgalSecondErrors", "[", 
+        RowBox[{"[", "realIndices", "]"}], "]"}]}], ";", "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Compute", " ", "the", " ", "minimum", " ", "relative", " ", "error", 
+        " ", "between", " ", "first", " ", "and", " ", "second", " ", 
+        "points"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"cgalErrors", " ", "=", " ", 
+       RowBox[{"MapThread", "[", 
+        RowBox[{"Min", ",", " ", 
+         RowBox[{"{", 
+          RowBox[{"cgalFirstErrors", ",", " ", "cgalSecondErrors"}], "}"}]}], 
+        "]"}]}], ";", "\n", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Compute", " ", "the", " ", "mean", " ", "CGAL", " ", "errors"}], " ", 
+       "*)"}], "\n", "  ", 
+      RowBox[{"meanCgalErrors", " ", "=", "  ", 
+       RowBox[{"summarizeData", "[", "cgalErrors", "]"}]}], ";", "\n", "\n", 
+      "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Combine", " ", "results", " ", "into", " ", "an", " ", 
+        "association"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"<|", 
+       RowBox[{
+       "\"\<KrummMethodErrors\>\"", " ", "->", " ", "meanCgalErrors"}], 
+       "|>"}]}]}], "\n", "]"}]}], "\n", "\n", "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"analysisPrecision", "=", "100"}], ";"}], "\n", "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"outputDirectory", " ", "=", " ", 
+    RowBox[{
+    "absolutePath", " ", "<>", " ", "\"\<mathematica_data_average/\>\""}]}], 
+   ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Create", " ", "CSV", " ", "data", " ", "list", " ", "holders"}], 
+   " ", "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"krummErrorsList", " ", "=", " ", 
+    RowBox[{"{", "}"}]}], ";"}], "\n", "\n"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"For", "[", 
+    RowBox[{
+     RowBox[{"i", " ", "=", " ", "1"}], ",", " ", 
+     RowBox[{"i", " ", "<", " ", 
+      RowBox[{"Length", "[", "offsets", "]"}]}], ",", " ", 
+     RowBox[{"i", "++"}], ",", "\n", "  ", 
+     RowBox[{"(*", " ", 
+      RowBox[{
+      "Format", " ", "start", " ", "and", " ", "end", " ", "latitudes"}], " ",
+       "*)"}], "\n", "  ", 
+     RowBox[{
+      RowBox[{"startLatStr", " ", "=", " ", 
+       RowBox[{"formatLatitude", "[", 
+        RowBox[{"offsets", "[", 
+         RowBox[{"[", "i", "]"}], "]"}], "]"}]}], ";", "\n", "  ", 
+      RowBox[{"endLatStr", " ", "=", " ", 
+       RowBox[{"formatLatitude", "[", 
+        RowBox[{"offsets", "[", 
+         RowBox[{"[", 
+          RowBox[{"i", " ", "+", " ", "1"}], "]"}], "]"}], "]"}]}], ";", "\n",
+       "  ", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{"Generate", " ", "filenames", " ", "with", " ", "precision"}], 
+       " ", "*)"}], "\n", "  ", 
+      RowBox[{"latRangeStr", " ", "=", " ", 
+       RowBox[{
+       "startLatStr", " ", "<>", " ", "\"\<_\>\"", " ", "<>", " ", 
+        "endLatStr"}]}], ";", "\n", "  ", 
+      RowBox[{"arcFilename", " ", "=", " ", 
+       RowBox[{
+       "latRangeStr", " ", "<>", " ", "\"\<Extreme_Arcs_Exponent.csv\>\""}]}],
+       ";", "\n", "  ", 
+      RowBox[{"benchmarkKrummFilename", " ", "=", " ", 
+       RowBox[{
+       "latRangeStr", " ", "<>", " ", "\"\<_krumm_double_Extreme.csv\>\""}]}],
+       ";", "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Construct", " ", "the", " ", "full", " ", "paths", " ", "to", " ", 
+        "the", " ", "files", " ", "and", " ", "import", " ", "data"}], " ", 
+       "*)"}], "\n", "  ", 
+      RowBox[{"arcData", " ", "=", " ", 
+       RowBox[{"importAndReconstructArcs", "[", 
+        RowBox[{
+        "absolutePath", " ", "<>", " ", "\"\<generated_arcs/\>\"", " ", "<>", 
+         " ", "arcFilename"}], "]"}]}], ";", "\n", "  ", "\n", "  ", 
+      RowBox[{"benchmarkData", " ", "=", " ", 
+       RowBox[{"importAndProcessCGALBenchmarkData", "[", 
+        RowBox[{
+        "absolutePath", " ", "<>", " ", "\"\<benchmark_results/\>\"", " ", "<>",
+          " ", "benchmarkKrummFilename"}], "]"}]}], ";", "\n", "  ", 
+      RowBox[{"errorAnalysisResults", " ", "=", " ", 
+       RowBox[{"analyzeKrummErrors", "[", 
+        RowBox[{
+        "arcData", ",", " ", "benchmarkData", ",", " ", "analysisPrecision"}],
+         "]"}]}], ";", "\n", "    ", 
+      RowBox[{"(*", " ", 
+       RowBox[{
+       "Calculate", " ", "midpoint", " ", "of", " ", "the", " ", "latitude", 
+        " ", "range"}], " ", "*)"}], "\n", "  ", 
+      RowBox[{"latitudeRangeMidpoint", " ", "=", " ", 
+       RowBox[{"N", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"offsets", "[", 
+             RowBox[{"[", "i", "]"}], "]"}], " ", "+", " ", 
+            RowBox[{"offsets", "[", 
+             RowBox[{"[", 
+              RowBox[{"i", " ", "+", " ", "1"}], "]"}], "]"}]}], ")"}], "/", 
+          "2"}], ",", " ", "analysisPrecision"}], "]"}]}], ";", "\n", "  ", 
+      "\n", "  ", 
+      RowBox[{"(*", " ", 
+       RowBox[{"Append", " ", "results", " ", "to", " ", "lists"}], " ", 
+       "*)"}], "\n", "  ", 
+      RowBox[{"AppendTo", "[", 
+       RowBox[{"krummErrorsList", ",", " ", 
+        RowBox[{"{", 
+         RowBox[{"latitudeRangeMidpoint", ",", " ", 
+          RowBox[{
+          "errorAnalysisResults", "[", "\"\<KrummMethodErrors\>\"", "]"}]}], 
+         "}"}]}], "]"}], ";"}]}], "\n", "]"}], ";"}], "\n", "\n", 
+  RowBox[{"(*", " ", 
+   RowBox[{"Export", " ", "results", " ", "to", " ", "CSV"}], " ", 
+   "*)"}]}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"Export", "[", 
+    RowBox[{
+     RowBox[{
+     "outputDirectory", " ", "<>", " ", 
+      "\"\<Krumm_Relative_Error_Extreme.csv\>\""}], ",", " ", 
+     "krummErrorsList", ",", " ", "\"\<CSV\>\""}], "]"}], ";"}], "\n", 
+  "\n"}], "\n", 
+ RowBox[{
+  RowBox[{"Print", "[", "\"\<Done CSV Writing\>\"", "]"}], ";"}]}], "Code",
+ CellChangeTimes->{
+  3.941647812548979*^9, {3.941648302494053*^9, 3.941648314063832*^9}, {
+   3.941648348591136*^9, 3.941648452904815*^9}, {3.942448237798872*^9, 
+   3.942448249653588*^9}, {3.94348606924125*^9, 3.943486076826247*^9}, {
+   3.9497065528521233`*^9, 3.9497065636519423`*^9}, {3.949706594691324*^9, 
+   3.949706602626635*^9}},ExpressionUUID->"8da4d8d1-9022-45bf-80f6-\
+6448ad11baa3"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+  "0.01`", ",", "0.001`", ",", "0.0001`", ",", "0.00001`", ",", 
+   "1.0000000000000002`*^-6", ",", "1.0000000000000002`*^-7", ",", 
+   "1.0000000000000004`*^-8", ",", "1.0000000000000005`*^-9", ",", 
+   "1.0000000000000006`*^-10", ",", "1.0000000000000006`*^-11", ",", 
+   "1.0000000000000006`*^-12", ",", "1.0000000000000007`*^-13", ",", 
+   "1.0000000000000008`*^-14", ",", "1.0000000000000009`*^-15"}], 
+  "}"}]], "Output",
+ CellChangeTimes->{3.941648400634714*^9, 3.94164845521565*^9, 
+  3.941723649233561*^9, 3.942448257158692*^9, 3.942451031862412*^9, 
+  3.943322761659954*^9, 3.943486078617486*^9},
+ CellLabel->
+  "Out[100]=",ExpressionUUID->"f8840977-483e-49d9-8668-320a324c910e"],
+
+Cell[BoxData["\<\"/Users/hongyuchen/Desktop/UCDavis/Stuffs/pythonProject/\"\>\
+"], "Output",
+ CellChangeTimes->{3.941648400634714*^9, 3.94164845521565*^9, 
+  3.941723649233561*^9, 3.942448257158692*^9, 3.942451031862412*^9, 
+  3.943322761659954*^9, 3.943486078618321*^9},
+ CellLabel->
+  "Out[102]=",ExpressionUUID->"baedc105-9ea6-475e-a90f-3beccc9871c4"],
+
+Cell[BoxData["\<\"Done CSV Writing\"\>"], "Print",
+ CellChangeTimes->{3.941648403385717*^9, 3.941648597400846*^9, 
+  3.941723797961106*^9, 3.942448398461764*^9, 3.9424511303606353`*^9, 
+  3.943322856598164*^9, 3.943487878768498*^9},
+ CellLabel->
+  "During evaluation of \
+In[97]:=",ExpressionUUID->"cd07ff5c-bc9c-40bd-80e1-4ccac8399576"]
+}, Open  ]]
+},
+WindowSize->{Full, Full},
+WindowMargins->{{-71, Automatic}, {Automatic, -894}},
+FrontEndVersion->"14.0 for Mac OS X ARM (64-bit) (December 12, 2023)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"8ed4c06d-0f37-44ec-a776-01f7589f54e4"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 36778, 879, 4689, "Code",ExpressionUUID->"d2f9db98-27e3-497e-97de-f95456afa66c"],
+Cell[37361, 903, 562, 8, 34, "Output",ExpressionUUID->"3bccdb37-b4e8-469d-9f8d-8df1f2c0d545"],
+Cell[37926, 913, 221, 4, 24, "Print",ExpressionUUID->"aa16cfe2-e1cf-4fb1-a0c1-73c389ff8fd1"]
+}, Open  ]],
+Cell[38162, 920, 155, 3, 35, "Text",ExpressionUUID->"f7d09dac-a08c-404b-a0b9-dd72cf830152"],
+Cell[CellGroupData[{
+Cell[38342, 927, 34187, 836, 4461, "Code",ExpressionUUID->"8da4d8d1-9022-45bf-80f6-6448ad11baa3"],
+Cell[72532, 1765, 729, 14, 37, "Output",ExpressionUUID->"f8840977-483e-49d9-8668-320a324c910e"],
+Cell[73264, 1781, 354, 6, 34, "Output",ExpressionUUID->"baedc105-9ea6-475e-a90f-3beccc9871c4"],
+Cell[73621, 1789, 337, 6, 24, "Print",ExpressionUUID->"cd07ff5c-bc9c-40bd-80e1-4ccac8399576"]
+}, Open  ]]
+}
+]
+*)
+

@@ -225,9 +225,6 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_newEqn(const V3_T<
     // Calculate the cross product, which gives us the vector n
     V3_T<T> n = simd_cross(pointA, pointB);
 
-    //Normalize n
-    n.normalize();
-
 
     // Extract nx, ny, nz components from vector n
     T nx = n[0];
