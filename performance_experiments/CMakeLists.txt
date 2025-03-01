@@ -1,0 +1,81 @@
+cmake_minimum_required(VERSION 3.5)
+project(VectorizedEFT)
+
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+
+# Add custom CMake module path for FindMPFR.cmake
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Find Eigen3
+find_package(Eigen3 REQUIRED)
+
+include(FetchContent)
+
+FetchContent_Declare(
+    TBB
+    GIT_REPOSITORY https://github.com/oneapi-src/oneTBB.git
+    GIT_TAG c9497714821c3d443ee44c732609eb6850195ffb
+)
+
+FetchContent_MakeAvailable(TBB)
+
+# Find MPFR, GMP, and MP++ libraries
+find_package(MPFR REQUIRED)
+find_package(GMP REQUIRED)
+find_package(mp++ REQUIRED)
+
+# Create simd_fma library
+add_library(simd_fma INTERFACE)
+target_link_libraries(simd_fma INTERFACE Eigen3::Eigen)
+target_link_libraries(simd_fma INTERFACE TBB::tbb)
+
+# Compilation options for FMA instructions
+target_compile_options(simd_fma INTERFACE -march=native -ffp-contract=off)
+# A note on -ffp-contract:
+#   The default on GCC (at least with -std=gnu17 instead of -std=c++17) is
+#   -fp-contract=fast, which can contract floating point multiplications and
+#   additions spanning across **multiple statements** into FMA instructions.
+#   This can be surprising and change the roundoff behavior. This is especially
+#   unsafe for EFT algorithms, which rely fundamentally on the IEEE 754
+#   roundoff behavior implied by the sequence of statements as literally
+#   written in the source file.
+
+# Add vectorized benchmark executable
+add_executable(GCA_ConstLat_Performance_Benchmark_vectorized GCA_ConstLat_Performance_Benchmark_vectorized.cc
+               instantiations/double.cc
+               instantiations/vec_width2.cc
+               instantiations/vec_width4.cc
+               instantiations/vec_width8.cc)
+
+target_link_libraries(GCA_ConstLat_Performance_Benchmark_vectorized simd_fma MPFR::MPFR GMP::GMP)
+
+# Add parallized benchmark executable
+add_executable(GCA_ConstLat_Performance_Benchmark_parallelized GCA_ConstLat_Performance_Benchmark_parallelized.cc
+               instantiations/double_parallel.cc
+               instantiations/vec_width2_parallel.cc
+               instantiations/vec_width4_parallel.cc
+               instantiations/vec_width8_parallel.cc)
+target_link_libraries(GCA_ConstLat_Performance_Benchmark_parallelized simd_fma MPFR::MPFR GMP::GMP)
+
+# Add scalar benchmark executable with MPFR Matrix
+add_executable(GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points.cc)
+target_link_libraries(GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points 
+    simd_fma
+    MPFR::MPFR
+    GMP::GMP
+    mp++::mp++)
+
+# # Add scalar benchmark executable with MPFR point
+# add_executable(GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Matrix GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Matrix.cc)
+# target_link_libraries(GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Matrix 
+#     simd_fma
+#     MPFR::MPFR
+#     GMP::GMP
+#     mp++::mp++)
+
+# add_executable(compare_performance compare_performance.cc old_performance.cc new_performance.cc)
+# target_link_libraries(compare_performance
+#                       simd_fma)

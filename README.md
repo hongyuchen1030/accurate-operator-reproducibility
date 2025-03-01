@@ -1,5 +1,5 @@
 # Accuracy Experiments
-This repository contains procedures to **reproduce the accuracy experiments** presented in the paper  
+This section contains procedures to **reproduce the accuracy experiments** presented in the paper  
 **SIAM Journal on Scientific Computing: Accurate Intersection Point Calculation**.
 
 All required commands are stored in `./accuracy_experiments/run_accuracy_benchmark.sh`. Since the project relies on `mppp` support, it is recommended to use `GCC 13` for building.
@@ -12,8 +12,8 @@ cd ./accuracy_experiments
 ```
 
 
-## Cmake build
-To build the project using `CMake` and `ninja`, run the following command
+## Cmake build 
+To build the project using `CMake` and `ninja`, run the following command. Make sure to update `-DCGAL_DIR` to your CGAL directory
 ```bash
 BUILD_DIR="build_gcc13"
 SRC_DIR="<source_directory>"
@@ -35,7 +35,7 @@ cmake -GNinja \
       -DCMAKE_C_COMPILER=gcc-13 \
       -DCMAKE_CXX_COMPILER=g++-13 \
       -DCMAKE_BUILD_TYPE=Release \
-      -DCGAL_DIR=/home/jpanetta/software/CGAL-6.0 \
+      -DCGAL_DIR=<Your-CGAL-Directory> \
       "$SRC_DIR"
 ninja
 
@@ -160,3 +160,8 @@ benchmarkKrummFilename = latRangeStr <> "_krumm_double_ArcUp.csv";
 ```
 
 Refer to the naming convention in `./generated_arcs` and `./benchmark_results` directories to ensure correctness.
+
+
+# Performance Experiments
+
+This section provides instruction for running the performance experiments
