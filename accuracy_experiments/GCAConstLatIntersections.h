@@ -124,8 +124,9 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_baselineEqn(V3_T<T
     T nz_squared = nz * nz;
 
     // Calculate s (as 's' in the formula)
-    T s = sqrt(nx_squared + ny_squared - constZ * constZ);
     T denominator = 1.0 - nz_squared;//1.0 - nz_squared;
+    T s = sqrt(1.0 - nz_squared - constZ * constZ);
+
 
     // Calculate p_x and p_y, which are the x and y coordinates of the intersection
     T p_x = - (constZ * nx * nz + s * ny) / denominator;
@@ -157,10 +158,9 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_baselineEqn_perfor
     T nx_squared = nx * nx;
     T ny_squared = ny * ny;
     T nz_squared = nz * nz;
-    T nx_squared_plus_ny_squared = nx_squared + ny_squared;
 
     // Calculate s (as 's' in the formula)
-    T s = sqrt(nx_squared_plus_ny_squared - constZ * constZ);
+    T s = sqrt(1.0 - nz_squared - constZ * constZ);
 
     // Calculate p_x and p_y, which are the x and y coordinates of the intersection
     T p_x = - (constZ * nx * nz + s * ny) / 1.0 - nz_squared;
