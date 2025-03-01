@@ -38,7 +38,9 @@ make
 ## Generate Data Set
 Use the following command to generate both the primary and secondary datasets, if needed. The generated data will be stored in `./accuracy_experiments/generated_arcs`, with each floating-point result represented as a pair of significant and exponent values.  
 
-In the script below, `LATITUDES` defines the latitude intervals for generating the primary dataset, while `"$OFFSETS"` specifies the offset intervals for the secondary experiments.s
+In the script below, `LATITUDES` defines the latitude intervals for generating the primary dataset, while `"$OFFSETS"` specifies the offset intervals for the secondary experiments
+
+It's highly recommanded to run `./sanitize_arcs` for the newly-generated arcs before running the experiments.
 
 ```bash
 # Specify the number of arcs you want to generate
@@ -66,8 +68,12 @@ while (( $(awk "BEGIN {print ($value >= 0.00000000000001)}") )); do
 done
 
 
+Optionally run the generate_arcs and sanitize_arcs  executables 
 ./generate_arcs "$NUM_ARCS" "$LATITUDES" "$OFFSETS"
 echo "generate_arcs has been executed."
+
+./sanitize_arcs "$MPFR_PRECISIONS" "$LATITUDES" "$OFFSETS"
+echo "sanitize_arcs has been executed."
 
 ```
 
@@ -116,3 +122,23 @@ QUERY_RANGE_ENTIRE_NORTH="{0,90}"
 echo "IntermediateAnalysis.m for entire globe has been executed."
 ```
 
+### Krumm's Implementation
+Since the Krumm's method and its implementation are in python only, so the implementations and analysis are isolated from the previous methods
+The Krumm's implementation is in `./accuracy_experiments/gcsxsc.py` with the required utilities and helper functions in `./accuracy_experiments/geometries.py`
+and `./accuracy_experiments/utils.py`.
+
+To run the Krumm's implementation, simply run the `./accuracy_experiments/gcsxsc.py`, it already take cares of the data read-in for both primary dataset and output. But make sure to check
+if the variable `base_path` in the `main` function point to the correct directories.
+
+For the analysis process, all required helper functions are written in the `./accuracy_experiments/krumm_accuracy.nb`. This notebook can be used to run the analysis for the primary dataset or secondary dataset, to do so,
+
+Update the following input to the correct one, (You can also refer to the naming convention in your ./generated_arcs and ./benchmark_results directories)
+
+1. For primary dataset, use
+  arcFilename = latRangeStr <> "Arcs_Exponent.csv";
+  benchmarkKrummFilename = latRangeStr <> "_krumm_double_ArcUp.csv";
+
+2. For secondary dataset, use
+  arcFilename = latRangeStr <> "ArcUp_Arcs_Exponent.csv";
+  benchmarkKrummFilename = latRangeStr <> "_krumm_double_ArcUp.csv";
+  
