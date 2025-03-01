@@ -20,15 +20,18 @@ echo "Configuring the project with CMake..."
 cmake -DCMAKE_C_COMPILER=gcc-13 \
       -DCMAKE_CXX_COMPILER=g++-13 \
       -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_CXX_FLAGS="-Wno-error=uninitialized" \
       "$SRC_DIR" || exit 1
 
 # Build the scalar benchmark target
 echo "Building the scalar benchmark..."
 make || exit 1
 
-# # Run the scalar benchmark executable
-# echo "Running the scalar benchmark..."
-# ./GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points || exit 1
+# Run the scalar benchmark executable
+echo "Running the scalar benchmark..."
+./GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points || exit 1
 
-# echo "Benchmark run completed!"
+# # Run the parallel benchmark executable
+# echo "Running the parallel benchmark..."
+# ./GCA_ConstLat_Performance_Benchmark_parallelized || exit 1
+
+echo "Benchmark run completed!"

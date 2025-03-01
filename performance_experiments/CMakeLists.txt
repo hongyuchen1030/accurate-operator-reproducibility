@@ -53,14 +53,7 @@ target_compile_options(simd_fma INTERFACE -march=native -ffp-contract=off)
 #   roundoff behavior implied by the sequence of statements as literally
 #   written in the source file.
 
-# Add vectorized benchmark executable
-add_executable(GCA_ConstLat_Performance_Benchmark_vectorized GCA_ConstLat_Performance_Benchmark_vectorized.cc
-               instantiations/double.cc
-               instantiations/vec_width2.cc
-               instantiations/vec_width4.cc
-               instantiations/vec_width8.cc)
 
-target_link_libraries(GCA_ConstLat_Performance_Benchmark_vectorized simd_fma MPFR::MPFR GMP::GMP)
 
 # Add parallized benchmark executable
 add_executable(GCA_ConstLat_Performance_Benchmark_parallelized GCA_ConstLat_Performance_Benchmark_parallelized.cc
@@ -78,14 +71,4 @@ target_link_libraries(GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points
     GMP::GMP
     mp++::mp++)
 
-# # Add scalar benchmark executable with MPFR point
-# add_executable(GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Matrix GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Matrix.cc)
-# target_link_libraries(GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Matrix 
-#     simd_fma
-#     MPFR::MPFR
-#     GMP::GMP
-#     mp++::mp++)
 
-# add_executable(compare_performance compare_performance.cc old_performance.cc new_performance.cc)
-# target_link_libraries(compare_performance
-#                       simd_fma)

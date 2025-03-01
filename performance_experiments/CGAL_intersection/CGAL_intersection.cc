@@ -90,7 +90,7 @@ double run_benchmark_CGAL(const size_t numTests, const Eigen::MatrixXd &ptsA, co
 }
 
 int main() {
-    static constexpr size_t dataSize = 1000000;
+    static constexpr size_t dataSize = 10000000;
 
     Eigen::MatrixXd ptsA, ptsB;
     Eigen::VectorXd lattitudes;

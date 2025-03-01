@@ -80,8 +80,8 @@ int main(int argc, const char *argv[]) {
     compute_values_EFT<double>(ptsA, ptsB, lattitudes, X_true, Y_true);  // Ensure this function is declared properly
 
     Eigen::VectorXd X_true_fp(dataSize), Y_true_fp(dataSize);
-    // compute_values_new<double>(ptsA, ptsB, lattitudes, X_true_fp, Y_true_fp);
-    // compute_values_old<double>(ptsA, ptsB, lattitudes, X_true_fp, Y_true_fp);
+    compute_values_new<double>(ptsA, ptsB, lattitudes, X_true_fp, Y_true_fp);
+    compute_values_old<double>(ptsA, ptsB, lattitudes, X_true_fp, Y_true_fp);
 
     // Initialize CSV file for output
     std::string output_directory = "../output";  // relative path to the output directory
@@ -95,61 +95,61 @@ int main(int argc, const char *argv[]) {
     csv_file << std::scientific << std::setprecision(16);
 
     // Write CSV header
-    // csv_file << "float_OldEqn,float_NewEqn,float_BaselineEqn,our_method";
+    csv_file << "float_OldEqn,float_NewEqn,float_BaselineEqn,our_method";
     for (int precision = 16; precision <= 32; precision += 16) {
         csv_file << ",MPFR" << precision << "_OldEqn,MPFR" << precision << "_NewEqn,MPFR" << precision << "_BaselineEqn";
     }
-    // csv_file << ",Quadruple_OldEqn,Quadruple_NewEqn,Quadruple_BaselineEqn\n";
+    csv_file << ",Quadruple_OldEqn,Quadruple_NewEqn,Quadruple_BaselineEqn\n";
 
     size_t num_tests = 0, passed = 0;
     
     // Function to calculate and store errors
-    // auto verify = [&](size_t vector_width) {
-    //     double x_error = (X - X_true).norm();
-    //     double y_error = (Y - Y_true).norm();
-    //     if ((x_error > 0) || (y_error > 0)) {
-    //         std::cerr << "Error with vector width " << vector_width << ": " << x_error << " " << y_error << std::endl;
-    //     }
-    //     else ++passed;
-    //     ++num_tests;
-    // };
+    auto verify = [&](size_t vector_width) {
+        double x_error = (X - X_true).norm();
+        double y_error = (Y - Y_true).norm();
+        if ((x_error > 0) || (y_error > 0)) {
+            std::cerr << "Error with vector width " << vector_width << ": " << x_error << " " << y_error << std::endl;
+        }
+        else ++passed;
+        ++num_tests;
+    };
 
-    // auto verify_fp = [&](size_t vector_width) {
-    //     double x_error = (X - X_true_fp).norm();
-    //     double y_error = (Y - Y_true_fp).norm();
-    //     if ((x_error > 0) || (y_error > 0)) {
-    //         std::cerr << "Error with vector width " << vector_width << ": " << x_error << " " << y_error << std::endl;
-    //     }
-    //     else ++passed;
-    //     ++num_tests;
-    // };
+    auto verify_fp = [&](size_t vector_width) {
+        double x_error = (X - X_true_fp).norm();
+        double y_error = (Y - Y_true_fp).norm();
+        if ((x_error > 0) || (y_error > 0)) {
+            std::cerr << "Error with vector width " << vector_width << ": " << x_error << " " << y_error << std::endl;
+        }
+        else ++passed;
+        ++num_tests;
+    };
 
     // Run the benchmark and save the average times
     for (size_t repeat = 0; repeat < 1; ++repeat) {
-        // std::cout << "\n========= Naive Floating Point Results =========\n" << std::endl;
-        // auto [time_new, time_old, time_baseline] = run_benchmark<double>(ptsA, ptsB, lattitudes, X, Y);
+        std::cout << "\n========= Naive Floating Point Results =========\n" << std::endl;
+        auto [time_new, time_old, time_baseline] = run_benchmark<double>(ptsA, ptsB, lattitudes, X, Y);
 
-        // double avg_time_new = time_new / (numTests * dataSize);
-        // double avg_time_old = time_old / (numTests * dataSize);
-        // double avg_time_baseline = time_baseline / (numTests * dataSize);
+        double avg_time_new = time_new / (numTests * dataSize);
+        double avg_time_old = time_old / (numTests * dataSize);
+        double avg_time_baseline = time_baseline / (numTests * dataSize);
 
-        // // Print out the FP results
-        // std::cout<< " \n Naive FP baseline equation: " << avg_time_baseline <<" seconds \n" << std::endl;
-        // std::cout<< " \n Naive FP old equation: " << avg_time_old <<" seconds \n" << std::endl;
-        // std::cout<< " \n Naive FP new equation: " << avg_time_new <<" seconds \n" << std::endl;
+        // Print out the FP results
+        std::cout<< " \n Naive FP baseline equation: " << avg_time_baseline <<" seconds \n" << std::endl;
+        std::cout<< " \n Naive FP old equation: " << avg_time_old <<" seconds \n" << std::endl;
+        std::cout<< " \n Naive FP new equation: " << avg_time_new <<" seconds \n" << std::endl;
 
 
-        // // **EFT Results (our_method)**
-        // std::cout << "\n========= EFT Results =========\n" << std::endl;
-        // auto eft_duration = run_benchmark_EFT<double>(ptsA, ptsB, lattitudes, X, Y);
-        // double avg_eft_time = eft_duration / (numTests * dataSize);
-        // // verify(1);
-        // X.setZero();
-        // Y.setZero();
-        // std::cout<< " \n Our EFT: " << avg_eft_time <<" seconds \n" << std::endl;
+        // **EFT Results (our_method)**
+        std::cout << "\n========= EFT Results =========\n" << std::endl;
+        auto eft_duration = run_benchmark_EFT<double>(ptsA, ptsB, lattitudes, X, Y);
+        double avg_eft_time = eft_duration / (numTests * dataSize);
+        // verify(1);
+        X.setZero();
+        Y.setZero();
+        std::cout<< " \n Our EFT: " << avg_eft_time <<" seconds \n" << std::endl;
 
-        // // Write results to CSV
-        // csv_file << avg_time_old << "," << avg_time_new << "," << avg_time_baseline << "," << avg_eft_time;
+        // Write results to CSV
+        csv_file << avg_time_old << "," << avg_time_new << "," << avg_time_baseline << "," << avg_eft_time;
 
         // MPFR test
         for (int precision = 16; precision <= 32; precision += 16) {
@@ -159,22 +159,22 @@ int main(int argc, const char *argv[]) {
             auto [time_mpfr_new, time_mpfr_old, time_mpfr_baseline] = handle_mpfr_precision(precision, ptsA, ptsB, lattitudes, X, Y);
 
             // Write the results to the CSV file
-            csv_file << precision  // Add the precision to the CSV file
+            csv_file
                     << "," << time_mpfr_old / (numTests * dataSize)
                     << "," << time_mpfr_new / (numTests * dataSize)
-                    << "," << time_mpfr_baseline / (numTests * dataSize) << "\n";
+                    << "," << time_mpfr_baseline / (numTests * dataSize) ;
         }
 
 
-        // std::cout << "\n========= Quadruple precision Results =========\n" << std::endl;
+        std::cout << "\n========= Quadruple precision Results =========\n" << std::endl;
 
-        // auto [time_new_quad, time_old_quad, time_baseline_quad] = run_quadruple_benchmark(ptsA, ptsB, lattitudes, X, Y);
+        auto [time_new_quad, time_old_quad, time_baseline_quad] = run_quadruple_benchmark(ptsA, ptsB, lattitudes, X, Y);
 
-        // // Write Quadruple results to CSV
-        // csv_file << "," << time_old_quad / (numTests * dataSize)
-        //          << "," << time_new_quad / (numTests * dataSize)
-        //          << "," << time_baseline_quad / (numTests * dataSize)
-        //          << "\n";
+        // Write Quadruple results to CSV
+        csv_file << "," << time_old_quad / (numTests * dataSize)
+                 << "," << time_new_quad / (numTests * dataSize)
+                 << "," << time_baseline_quad / (numTests * dataSize)
+                 << "\n";
     }
 
     std::cout << passed << "/" << num_tests  << " tests passed" << std::endl;

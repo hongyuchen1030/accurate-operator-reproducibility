@@ -26,7 +26,7 @@ cmake -GNinja \
 ninja
 
 
-# ./CGAL_intersection
-# echo "Complete running of CGAL_intersection"
+./CGAL_intersection
+echo "Complete running of CGAL_intersection"
 
 

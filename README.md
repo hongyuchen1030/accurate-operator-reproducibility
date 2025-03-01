@@ -2,7 +2,7 @@
 This section contains procedures to **reproduce the accuracy experiments** presented in the paper  
 **SIAM Journal on Scientific Computing: Accurate Intersection Point Calculation**.
 
-All required commands are stored in `./accuracy_experiments/run_accuracy_benchmark.sh`. Since the project relies on `mppp` support, it is recommended to use `GCC 13` for building.
+All required commands are stored in `./accuracy_experiments/run_accuracy_benchmark.sh`. Since this code uses `libquadmath`, we recommend building with recent version of GCC. The following instructions build the code with GCC-13.
 
 
 > **Note:** All commands should be executed within the `./accuracy_experiments` directory.  
@@ -15,30 +15,18 @@ cd ./accuracy_experiments
 ## Cmake build 
 To build the project using `CMake` and `ninja`, run the following command. Make sure to update `-DCGAL_DIR` to your CGAL directory
 ```bash
-BUILD_DIR="build_gcc13"
-SRC_DIR="<source_directory>"
+# Create and enter the build directory
+mkdir -p build && cd build
 
-
-Clean up the old build directory if it exists
-if [ -d "$BUILD_DIR" ]; then
-  echo "Removing old build directory: $BUILD_DIR"
-  rm -rf "$BUILD_DIR"
-fi
-
-# Create the new build directory
-echo "Creating build directory: $BUILD_DIR"
-mkdir "$BUILD_DIR"
-cd "$BUILD_DIR" || exit 1
-
-echo "Configuring the project with CMake..."
-cmake -GNinja \
+# Configure the project with CMake
+cmake .. -GNinja \
       -DCMAKE_C_COMPILER=gcc-13 \
       -DCMAKE_CXX_COMPILER=g++-13 \
       -DCMAKE_BUILD_TYPE=Release \
-      -DCGAL_DIR=<Your-CGAL-Directory> \
-      "$SRC_DIR"
-ninja
+      -DCGAL_DIR=<Your-CGAL-Directory>
 
+# Compile the project
+ninja
 
 ```
 
@@ -50,7 +38,7 @@ In the script below, `LATITUDES` defines the latitude intervals for generating t
 It's highly recommanded to run `./sanitize_arcs` for the newly-generated arcs before running the experiments.
 
 ```bash
-# Specify the number of arcs you want to generate
+# Specify the number of arcs for each region you want to generate
 NUM_ARCS="100000"
 
 
@@ -75,7 +63,7 @@ while (( $(awk "BEGIN {print ($value >= 0.00000000000001)}") )); do
 done
 
 
-Optionally run the generate_arcs and sanitize_arcs  executables 
+# Optionally run the generate_arcs and sanitize_arcs  executables 
 ./generate_arcs "$NUM_ARCS" "$LATITUDES" "$OFFSETS"
 echo "generate_arcs has been executed."
 
@@ -165,3 +153,28 @@ Refer to the naming convention in `./generated_arcs` and `./benchmark_results` d
 # Performance Experiments
 
 This section provides instruction for running the performance experiments
+> **Note:** All commands should be executed within the `./performance_experiments` directory.  
+> Before proceeding, navigate to the correct directory using:
+```bash
+cd ./performance_experiments
+```
+
+## For Direct Floating Points/ MPFR and Quadruple Precisions
+
+### Cmake build 
+To build the project using `CMake` and `ninja`, run the following command.  Since this code uses `libquadmath`, we recommend building with recent version of GCC. The following instructions build the code with GCC-13.
+```bash
+# Create and enter the build directory
+mkdir -p build && cd build
+
+# Configure the project with CMake
+cmake .. -GNinja \
+      -DCMAKE_C_COMPILER=gcc-13 \
+      -DCMAKE_CXX_COMPILER=g++-13 \
+      -DCMAKE_BUILD_TYPE=Release \
+
+# Compile the project
+make || exit 1
+```
+
+### Run Benchmarks
