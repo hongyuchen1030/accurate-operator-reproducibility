@@ -56,12 +56,12 @@ QUERY_RANGE="{0,1},{2,89},{89,90}"
 QUERY_RANGE_ENTIRE_NORTH="{0,90}"
 
 
-# Optionally run the generate_arcs and sanitize_arcs  executables 
-# ./generate_arcs "$NUM_ARCS" "$LATITUDES" "$OFFSETS"
-# echo "generate_arcs has been executed."
+Optionally run the generate_arcs and sanitize_arcs  executables 
+./generate_arcs "$NUM_ARCS" "$LATITUDES" "$OFFSETS"
+echo "generate_arcs has been executed."
 
-# ./sanitize_arcs "$MPFR_PRECISIONS" "$LATITUDES" "$OFFSETS"
-# echo "sanitize_arcs has been executed."
+./sanitize_arcs "$MPFR_PRECISIONS" "$LATITUDES" "$OFFSETS"
+echo "sanitize_arcs has been executed."
 
 ./run_benchmarks "$MPFR_PRECISIONS" "$LATITUDES" "$OFFSETS"
 echo "run_benchmarks has been executed."

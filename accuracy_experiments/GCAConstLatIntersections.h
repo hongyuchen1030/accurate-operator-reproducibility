@@ -277,40 +277,38 @@ public:
     }
 
     std::tuple<double, double> gca_constLat_intersection_accurate(const std::array<double, 3>& x1, const std::array<double, 3>& x2, double z0, intermediate_values_our& intermediateValuesOur) {
-        // Step 1: Calculate nx, ny, nz and their errors using the fmms_re helper
-        auto [nx, enx] = fmms_re(x1[1], x2[2], x1[2], x2[1]);  // Component x
-        auto [ny, eny] = fmms_re(x1[2], x2[0], x1[0], x2[2]);  // Component y
-        auto [nz, enz] = fmms_re(x1[0], x2[1], x1[1], x2[0]);  // Component z
+        // Step 1: Calculate nx, ny, nz and their errors using the AccuDOP helper
+        auto [nx, enx] = AccuDOP(x1[1], x2[2], x1[2], x2[1]);  // Component x
+        auto [ny, eny] = AccuDOP(x1[2], x2[0], x1[0], x2[2]);  // Component y
+        auto [nz, enz] = AccuDOP(x1[0], x2[1], x1[1], x2[0]);  // Component z
 
         intermediateValuesOur.nx_pair = {nx, enx};
 
         // Step 2: Calculate sum of squares for nx and ny
-        auto [nx_squared_plus_ny_squared_pre, nx_squared_plus_ny_squared_err_pre] = sum_of_squares_re(std::array<double, 2>{nx, ny}, std::array<double, 2>{enx, eny});
-        auto [nx_squared_plus_ny_squared, nx_squared_plus_ny_squared_err] = two_sum(nx_squared_plus_ny_squared_pre, nx_squared_plus_ny_squared_err_pre);
-        intermediateValuesOur.nxSquarenySquare = nx_squared_plus_ny_squared;
+        auto [S2, s2_err] = SumOfSquaresC(std::array<double, 2>{nx, ny}, std::array<double, 2>{enx, eny});
+        intermediateValuesOur.nxSquarenySquare = S2;
 
         // Step 3: Calculate sum of squares for the full vector including nz
-        auto [norm_n_squared_pre, norm_n_squared_err_pre] = sum_of_squares_re(std::array<double, 3>{nx, ny, nz}, std::array<double, 3>{enx, eny, enz});
-        auto [norm_n_squared, norm_n_squared_err] = two_sum(norm_n_squared_pre, norm_n_squared_err_pre);
-        intermediateValuesOur.nNorm_pair = {norm_n_squared, norm_n_squared_err};
+        auto [S3, s3_err] = SumOfSquaresC(std::array<double, 3>{nx, ny, nz}, std::array<double, 3>{enx, eny, enz});
+        intermediateValuesOur.nNorm_pair = {S3, s3_err};
 
         // Step 4: TwoProd for z0
         auto [C, c] = two_prod_fma(z0, z0);
 
-        // Step 5: Calculate J and j using dot_fma_re with norm_n_squared and C
-        auto [J, j] = dot_fma_re(std::array<double, 4>{norm_n_squared, norm_n_squared, norm_n_squared_err, norm_n_squared_err}, std::array<double, 4>{C, c, C, c});
+        // Step 5: Calculate D and d using dot_fma_re with S3 and C
+        auto [D, d] = CompDotC(std::array<double, 4>{S3, S3, s3_err, s3_err}, std::array<double, 4>{C, c, C, c});
 
-        // Step 6: TwoSum for -J and nx_squared_plus_ny_squared
-        auto [s2, f] = two_sum(-J, nx_squared_plus_ny_squared);
+        // Step 6: TwoSum for -D and S2
+        auto [E, e] = two_sum(-D, S2);
 
-        // Step 7: Vector sum for -j, nx_squared_plus_ny_squared_err, and f
-        double es2 = -j + nx_squared_plus_ny_squared_err + f;
+        // Step 7: Vector sum for -d, s2_err, and e
+        double es2 = -d + s2_err + e;
 
-        // Step 8: Apply two_sum to combine s2 and es2
-        auto [s2_, es2_] = two_sum(s2, es2);
+        // Step 8: Apply two_sum to combine E and es2
+        auto [s2_, es2_] = two_sum(E, es2);
         intermediateValuesOur.sSquare_pair = {s2_, es2_};
 
-        // Step 9: Calculate sqrt for s2 and es2 using acc_sqrt_re
+        // Step 9: Calculate sqrt for E and es2 using acc_sqrt_re
         auto [s, es] = acc_sqrt_re(s2_, es2_);
         intermediateValuesOur.s_pair = {s, es};
 
@@ -324,12 +322,12 @@ public:
         std::array<double, 6> vec2x = {z0, z0, s, s, es, es};
 
         // Step 11: Use dot_fma to calculate D
-        double D = dot_fma(vec1x, vec2x);
+        double x = dot_fma(vec1x, vec2x);
 
         // Step 12: Store intermediate values
-        intermediateValuesOur.znxnz_pair = dot_fma_re(std::array<double, 2>{A_px, ea_px}, std::array<double, 2>{z0, z0});
-        intermediateValuesOur.sny_pair = dot_fma_re(std::array<double, 4>{ny, eny, ny, eny}, std::array<double, 4>{s, s, es, es});
-        intermediateValuesOur.znxnz_sny = D;
+        intermediateValuesOur.znxnz_pair = CompDotC(std::array<double, 2>{A_px, ea_px}, std::array<double, 2>{z0, z0});
+        intermediateValuesOur.sny_pair = CompDotC(std::array<double, 4>{ny, eny, ny, eny}, std::array<double, 4>{s, s, es, es});
+        intermediateValuesOur.znxnz_sny = x;
 
         // Step 13: Calculate the terms for p_y
         auto [H, eh1] = two_prod_fma(ny, nz);
@@ -341,12 +339,12 @@ public:
         std::array<double, 6> vec2y = {z0, z0, s, s, es, es};
 
         // Step 14: Use dot_fma to calculate E
-        double E = dot_fma(vec1y, vec2y);
+        double y = dot_fma(vec1y, vec2y);
 
         // Step 15: Calculate final results res_x and res_y
-        double res_x = -D / nx_squared_plus_ny_squared;
+        double res_x = -x / S2;
         intermediateValuesOur.px = res_x;
-        double res_y = -E / nx_squared_plus_ny_squared;
+        double res_y = -y / S2;
 
         return {res_x, res_y};
     }
@@ -373,7 +371,7 @@ private:
 
     // FMA-based product difference using template T
     template <typename T>
-    std::tuple<T, T> fmms_re(T a, T b, T c, T d) {
+    std::tuple<T, T> AccuDOP(T a, T b, T c, T d) {
         auto [p1, s1] = two_prod_fma(a, b);  
         T neg_d = -d;
         auto [h2, r2] = two_prod_fma(c, neg_d);
@@ -451,9 +449,9 @@ private:
 
 
 
-    // General template for dot_fma_re when T is a scalar (double)
+    // General template for CompDotC when T is a scalar (double)
     template <typename T, std::size_t N>
-    std::tuple<T, T> dot_fma_re(const std::array<T, N>& v1, const std::array<T, N>& v2) {
+    std::tuple<T, T> CompDotC(const std::array<T, N>& v1, const std::array<T, N>& v2) {
         T s, c;
         std::tie(s, c) = two_prod_fma(v1[0], v2[0]);
         for (std::size_t i = 1; i < N; ++i) {
@@ -508,9 +506,9 @@ private:
     }
 
 
-    // General template for sum_of_squares_re when T is double
+    // General template for SumOfSquaresC when T is double
     template <typename T, std::size_t N>
-    std::tuple<T, T> sum_of_squares_re(const std::array<T, N>& vals, const std::array<T, N>& errs) {
+    std::tuple<T, T> SumOfSquaresC(const std::array<T, N>& vals, const std::array<T, N>& errs) {
         // Initialize S and s based on type T
         T S;
         T s;
@@ -529,8 +527,9 @@ private:
 
         // Error term
         T err = 2 * R + s;
+        auto [S_new, err_new] = fast_two_sum(S, err);
 
-        return std::make_tuple(S, err);  // Return the sum of squares and the error term
+        return std::make_tuple(S_new, err_new);  // Return the sum of squares and the error term
     }
 
 
