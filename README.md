@@ -4,19 +4,22 @@ This repository contains procedures to **reproduce the accuracy experiments** pr
 
 All required commands are stored in `./accuracy_experiments/run_accuracy_benchmark.sh`. Since the project relies on `mppp` support, it is recommended to use `GCC 13` for building.
 
+
 > **Note:** All commands should be executed within the `./accuracy_experiments` directory.  
 > Before proceeding, navigate to the correct directory using:
 ```bash
 cd ./accuracy_experiments
 ```
 
+
 ## Cmake build
-To build the project using CMake, run the following command
+To build the project using `CMake` and `ninja`, run the following command
 ```bash
 BUILD_DIR="build_gcc13"
 SRC_DIR="<source_directory>"
 
 
+Clean up the old build directory if it exists
 if [ -d "$BUILD_DIR" ]; then
   echo "Removing old build directory: $BUILD_DIR"
   rm -rf "$BUILD_DIR"
@@ -27,16 +30,20 @@ echo "Creating build directory: $BUILD_DIR"
 mkdir "$BUILD_DIR"
 cd "$BUILD_DIR" || exit 1
 
-# Run CMake with GCC 13 and Release mode
 echo "Configuring the project with CMake..."
-cmake -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_CXX_COMPILER=g++-13 -DCMAKE_BUILD_TYPE=Release "$SRC_DIR" || exit 1
+cmake -GNinja \
+      -DCMAKE_C_COMPILER=gcc-13 \
+      -DCMAKE_CXX_COMPILER=g++-13 \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCGAL_DIR=/home/jpanetta/software/CGAL-6.0 \
+      "$SRC_DIR"
+ninja
 
-make
 
 ```
 
 ## Generate Data Set
-Use the following command to generate both the primary and secondary datasets, if needed. The generated data will be stored in `./accuracy_experiments/generated_arcs`, with each floating-point result represented as a pair of significant and exponent values.  
+Use the following command to generate both the primary and secondary datasets, if needed. The generated data will be stored in `./accuracy_experiments/generated_arcs`, with each floating-point result represented as a pair of significand and exponent values.  
 
 In the script below, `LATITUDES` defines the latitude intervals for generating the primary dataset, while `"$OFFSETS"` specifies the offset intervals for the secondary experiments
 
@@ -80,7 +87,8 @@ echo "sanitize_arcs has been executed."
 
 ### Run the benchmark
 Below will generate the benchmark for both primary and secondary datasets that's being stored in the directory `./accuracy_experiments/benchmark_results` and also the intermediate results will also be stored in `./accuracy_experiments/intermediate_results`. each flaoting point number results will be store as a pair of significant and exponent.
-```
+
+```bash
 # The selected MPFR precisions,
 MPFR_PRECISIONS="16,17,18,19,20,22,24,26,28,30,32"
 
@@ -123,22 +131,32 @@ echo "IntermediateAnalysis.m for entire globe has been executed."
 ```
 
 ### Krumm's Implementation
-Since the Krumm's method and its implementation are in python only, so the implementations and analysis are isolated from the previous methods
-The Krumm's implementation is in `./accuracy_experiments/gcsxsc.py` with the required utilities and helper functions in `./accuracy_experiments/geometries.py`
-and `./accuracy_experiments/utils.py`.
+Krumm's method is implemented in Python and analyzed separately from other methods.
+The implementation files are:
 
-To run the Krumm's implementation, simply run the `./accuracy_experiments/gcsxsc.py`, it already take cares of the data read-in for both primary dataset and output. But make sure to check
-if the variable `base_path` in the `main` function point to the correct directories.
+- `./accuracy_experiments/gcsxsc.py`
+- `./accuracy_experiments/geometries.py`
+- `./accuracy_experiments/utils.py`
 
-For the analysis process, all required helper functions are written in the `./accuracy_experiments/krumm_accuracy.nb`. This notebook can be used to run the analysis for the primary dataset or secondary dataset, to do so,
+To run the Krumm’s method, execute:
 
-Update the following input to the correct one, (You can also refer to the naming convention in your ./generated_arcs and ./benchmark_results directories)
+```bash
+python3 ./accuracy_experiments/gcsxsc.py
+```
 
-1. For primary dataset, use
-  arcFilename = latRangeStr <> "Arcs_Exponent.csv";
-  benchmarkKrummFilename = latRangeStr <> "_krumm_double_ArcUp.csv";
+Ensure that the variable **`base_path`** in the `main` function points to the correct directories.
 
-2. For secondary dataset, use
-  arcFilename = latRangeStr <> "ArcUp_Arcs_Exponent.csv";
-  benchmarkKrummFilename = latRangeStr <> "_krumm_double_ArcUp.csv";
-  
+For analysis, use the `./accuracy_experiments/krumm_accuracy.nb` notebook. Update the following inputs:
+
+1. **For primary dataset:**
+```mathematica
+arcFilename = latRangeStr <> "Arcs_Exponent.csv";
+benchmarkKrummFilename = latRangeStr <> "_krumm_double_ArcUp.csv";
+```
+2. **For secondary dataset:**
+```mathematica
+arcFilename = latRangeStr <> "ArcUp_Arcs_Exponent.csv";
+benchmarkKrummFilename = latRangeStr <> "_krumm_double_ArcUp.csv";
+```
+
+Refer to the naming convention in `./generated_arcs` and `./benchmark_results` directories to ensure correctness.
