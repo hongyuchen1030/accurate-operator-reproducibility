@@ -30,8 +30,8 @@ make || exit 1
 echo "Running the scalar benchmark..."
 ./GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points || exit 1
 
-# # Run the parallel benchmark executable
-# echo "Running the parallel benchmark..."
-# ./GCA_ConstLat_Performance_Benchmark_parallelized || exit 1
+# Run the parallel benchmark executable
+echo "Running the parallel benchmark..."
+./GCA_ConstLat_Performance_Benchmark_parallelized || exit 1
 
 echo "Benchmark run completed!"

@@ -178,3 +178,67 @@ make || exit 1
 ```
 
 ### Run Benchmarks
+The scalar performance benchmark is stored in `./GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points.cc`. Before running, adjust the following values inside its `main` function as needed.
+The output is stored in `./performance_experiments/output/average_time_scalar_MPFR_points.csv`.
+```C++
+      static constexpr size_t dataSize = 10000000; // Adjust the datasize values
+```
+
+The vectorized and parallelized performance benchmark is stored in `./performance_experiments/GCA_ConstLat_Performance_Benchmark_parallelized.cc`. Similarly, adjust the following values:
+```C++
+      static constexpr size_t numTest_hardcoded = 100; // Number of test repeat to make sure cache is warmed up
+      static constexpr size_t dataSize = 100000000;
+```
+The output is stored in `./performance_experiments/output/average_time_parallel.csv`.
+
+To run both benchmarks, simply use the following commands in the correct directory:
+
+```bash
+# Run the scalar benchmark executable
+echo "Running the scalar benchmark..."
+./GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points || exit 1
+
+# Run the parallel benchmark executable
+echo "Running the parallel benchmark..."
+./GCA_ConstLat_Performance_Benchmark_parallelized || exit 1
+
+```
+
+
+## For CGAL performance benchmark
+Navigate into the  `./performance_experiments/CGAL_intersection` directory
+
+### Cmake build 
+To build the project using `CMake` and `ninja`, run the following command. For consistency with other experiments, these instructions use `GCC-13`.
+Make sure to update `-DCGAL_DIR` with the path to your CGAL directory.
+```bash
+# Create and enter the build directory
+mkdir -p build && cd build
+
+# Configure the project with CMake
+cmake .. -GNinja \
+      -DCMAKE_C_COMPILER=gcc-13 \
+      -DCMAKE_CXX_COMPILER=g++-13 \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCGAL_DIR=<Your-CGAL-Directory>
+
+# Compile the project
+ninja
+
+```
+
+### Run Benchmarks
+All benchmarks, both scalar and parallelized, are located in `./performance_experiments/CGAL_intersection/CGAL_intersection.cc`.
+
+Similarly, adjust the following value in the main function to your preferred setting:
+```C++
+      static constexpr size_t dataSize = 10000000;
+```
+
+To run the performance use 
+```bash
+./CGAL_intersection
+```
+
+
+The results will be displayed in the terminal.
