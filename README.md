@@ -164,7 +164,7 @@ cd ./performance_experiments
 ## For Direct Floating Points/ MPFR and Quadruple Precisions
 
 ### Cmake build 
-To build the project using `CMake` and `ninja`, run the following command.  Since this code uses `libquadmath`, we recommend building with recent version of GCC. The following instructions build the code with GCC-13.
+To build the project using `CMake` , run the following command.  Since this code uses `libquadmath`, we recommend building with recent version of GCC. The following instructions build the code with GCC-13.
 ```bash
 # Create and enter the build directory
 mkdir -p build && cd build
