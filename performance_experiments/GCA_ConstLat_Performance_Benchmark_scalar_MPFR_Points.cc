@@ -26,7 +26,7 @@ void create_output_directory(const std::string& directory) {
 
 
 int main(int argc, const char *argv[]) {
-    static constexpr size_t dataSize = 10000000;
+    static constexpr size_t dataSize = 100000;
     Eigen::MatrixXd ptsA(dataSize, 3), ptsB(dataSize, 3);
     Eigen::VectorXd lattitudes(dataSize), X(dataSize), Y(dataSize);
 

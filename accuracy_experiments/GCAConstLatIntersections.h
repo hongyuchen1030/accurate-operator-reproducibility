@@ -106,14 +106,14 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_baselineEqn(V3_T<T
 //    if (abs(pointA[2]) < std::abs(pointB[2])) {
 //        pointA.swap(pointB);
 //    }
-    // Calculate the cross product, which gives us the vector n and normalize it
+
     V3_T<T> n = simd_cross(pointA, pointB);
 
-    //Normalize n
+
     n.normalize();
 
 
-    // Extract nx, ny, nz components from vector n
+
     T nx = n[0];
     T ny = n[1];
     T nz = n[2];
@@ -142,14 +142,12 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_baselineEqn_perfor
 //    if (abs(pointA[2]) < std::abs(pointB[2])) {
 //        pointA.swap(pointB);
 //    }
-    // Calculate the cross product, which gives us the vector n and normalize it
+
     V3_T<T> n = simd_cross(pointA, pointB);
 
-    //Normalize n
+
     n.normalize();
 
-
-    // Extract nx, ny, nz components from vector n
     T nx = n[0];
     T ny = n[1];
     T nz = n[2];
@@ -183,11 +181,11 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_oldEqn(V3_T<T>& po
     // Calculate the cross product, which gives us the vector n and normalize it
     V3_T<T> n = simd_cross(pointA, pointB);
 
-    //Normalize n
+
     n.normalize();
 
 
-    // Extract nx, ny, nz components from vector n
+
     T nx = n[0];
     T ny = n[1];
     T nz = n[2];
@@ -200,7 +198,7 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_oldEqn(V3_T<T>& po
 
     // Calculate s (as 's' in the formula)
     T s = sqrt(nx_squared_plus_ny_squared - constZ * constZ);
-    // T denominator = nx_squared+ny_squared;//1.0 - nz_squared;
+
 
     // Calculate p_x and p_y, which are the x and y coordinates of the intersection
     T p_x = - (constZ * nx * nz + s * ny) / nx_squared_plus_ny_squared;
@@ -222,16 +220,16 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_newEqn(
 template<typename T>
 static std::tuple<T, T> gca_constLat_intersection_coordinates_newEqn(const V3_T<T>& pointA, const V3_T<T>& pointB, T constZ,
                                                                      intermediate_values_compare<T>& intermediateValuesCompare) {
-    // Calculate the cross product, which gives us the vector n
+
     V3_T<T> n = simd_cross(pointA, pointB);
 
 
-    // Extract nx, ny, nz components from vector n
+
     T nx = n[0];
     T ny = n[1];
     T nz = n[2];
 
-    //print out the calculated nx, ny, nz
+
     intermediateValuesCompare.nx = nx;
 
 
@@ -245,7 +243,7 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_newEqn(const V3_T<
 
     T s_tilde = sqrt(nx_squared_plus_ny_squared - norm_n_squared * constZ * constZ);
 
-    // print out the calculated norm_n_squared
+
     intermediateValuesCompare.nxSquarenySquare = nx_squared+ ny_squared;
     intermediateValuesCompare.nNorm = norm_n_squared;
     intermediateValuesCompare.sSquare = (nx_squared_plus_ny_squared - norm_n_squared * constZ * constZ);
@@ -277,42 +275,41 @@ public:
     }
 
     std::tuple<double, double> gca_constLat_intersection_accurate(const std::array<double, 3>& x1, const std::array<double, 3>& x2, double z0, intermediate_values_our& intermediateValuesOur) {
-        // Step 1: Calculate nx, ny, nz and their errors using the AccuDOP helper
-        auto [nx, enx] = AccuDOP(x1[1], x2[2], x1[2], x2[1]);  // Component x
-        auto [ny, eny] = AccuDOP(x1[2], x2[0], x1[0], x2[2]);  // Component y
-        auto [nz, enz] = AccuDOP(x1[0], x2[1], x1[1], x2[0]);  // Component z
+
+        auto [nx, enx] = AccuDOP(x1[1], x2[2], x1[2], x2[1]);  
+        auto [ny, eny] = AccuDOP(x1[2], x2[0], x1[0], x2[2]);  
+        auto [nz, enz] = AccuDOP(x1[0], x2[1], x1[1], x2[0]);  
 
         intermediateValuesOur.nx_pair = {nx, enx};
 
-        // Step 2: Calculate sum of squares for nx and ny
+
         auto [S2, s2_err] = SumOfSquaresC(std::array<double, 2>{nx, ny}, std::array<double, 2>{enx, eny});
         intermediateValuesOur.nxSquarenySquare = S2;
 
-        // Step 3: Calculate sum of squares for the full vector including nz
+
         auto [S3, s3_err] = SumOfSquaresC(std::array<double, 3>{nx, ny, nz}, std::array<double, 3>{enx, eny, enz});
         intermediateValuesOur.nNorm_pair = {S3, s3_err};
 
-        // Step 4: TwoProd for z0
+
         auto [C, c] = two_prod_fma(z0, z0);
 
-        // Step 5: Calculate D and d using dot_fma_re with S3 and C
         auto [D, d] = CompDotC(std::array<double, 4>{S3, S3, s3_err, s3_err}, std::array<double, 4>{C, c, C, c});
 
-        // Step 6: TwoSum for -D and S2
+
         auto [E, e] = two_sum(-D, S2);
 
-        // Step 7: Vector sum for -d, s2_err, and e
+=
         double es2 = -d + s2_err + e;
 
-        // Step 8: Apply two_sum to combine E and es2
+
         auto [s2_, es2_] = two_sum(E, es2);
         intermediateValuesOur.sSquare_pair = {s2_, es2_};
 
-        // Step 9: Calculate sqrt for E and es2 using acc_sqrt_re
+
         auto [s, es] = acc_sqrt_re(s2_, es2_);
         intermediateValuesOur.s_pair = {s, es};
 
-        // Step 10: Calculate the terms for s * nx * nz using two_prod_fma
+
         auto [A_px, ea1_px] = two_prod_fma(nx, nz);
         double ea2_px = nx * enz;
         double ea3_px = nz * enx;
@@ -321,15 +318,15 @@ public:
         std::array<double, 6> vec1x = {A_px, ea_px, ny, eny, ny, eny};
         std::array<double, 6> vec2x = {z0, z0, s, s, es, es};
 
-        // Step 11: Use dot_fma to calculate D
+
         double x = dot_fma(vec1x, vec2x);
 
-        // Step 12: Store intermediate values
+
         intermediateValuesOur.znxnz_pair = CompDotC(std::array<double, 2>{A_px, ea_px}, std::array<double, 2>{z0, z0});
         intermediateValuesOur.sny_pair = CompDotC(std::array<double, 4>{ny, eny, ny, eny}, std::array<double, 4>{s, s, es, es});
         intermediateValuesOur.znxnz_sny = x;
 
-        // Step 13: Calculate the terms for p_y
+
         auto [H, eh1] = two_prod_fma(ny, nz);
         double eh2 = ny * enz;
         double eh3 = nz * eny;
@@ -338,10 +335,10 @@ public:
         std::array<double, 6> vec1y = {H, eh, -nx, -enx, -nx, -enx};
         std::array<double, 6> vec2y = {z0, z0, s, s, es, es};
 
-        // Step 14: Use dot_fma to calculate E
+
         double y = dot_fma(vec1y, vec2y);
 
-        // Step 15: Calculate final results res_x and res_y
+
         double res_x = -x / S2;
         intermediateValuesOur.px = res_x;
         double res_y = -y / S2;
@@ -461,7 +458,7 @@ private:
             std::tie(s, sigma) = two_sum(s, p);
             c += pi + sigma;
         }
-        return std::make_tuple(s, c);  // Return the dot product and compensation term
+        return std::make_tuple(s, c); 
     }
 
 
@@ -499,10 +496,10 @@ private:
         for (std::size_t i = 1; i < N; ++i) {
             auto [partial_sum, err] = two_sum(sum, arr[i]);  // Perform two_sum to maintain accuracy
             sum = partial_sum;
-            compensator += err;  // Accumulate the error term
+            compensator += err; 
         }
 
-        return sum + compensator;  // Return the compensated sum
+        return sum + compensator;  
     }
 
 
@@ -516,20 +513,19 @@ private:
         s = 0.0;
 
         for (std::size_t i = 0; i < N; ++i) {
-            auto [P, p] = two_prod_fma(vals[i], vals[i]);  // Compute product and error for vals[i]^2
-            auto [new_S, new_s] = sum_non_neg(std::make_tuple(S, s), std::make_tuple(P, p));  // Sum with compensation
+            auto [P, p] = two_prod_fma(vals[i], vals[i]); 
+            auto [new_S, new_s] = sum_non_neg(std::make_tuple(S, s), std::make_tuple(P, p)); 
             S = new_S;
             s = new_s;
         }
 
-        // Compute the dot product between the values and errors
         T R = dot_fma(vals, errs);
 
         // Error term
         T err = 2 * R + s;
         auto [S_new, err_new] = fast_two_sum(S, err);
 
-        return std::make_tuple(S_new, err_new);  // Return the sum of squares and the error term
+        return std::make_tuple(S_new, err_new);  
     }
 
 

@@ -38,10 +38,10 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_baselineEqn_perfor
     // Calculate the cross product, which gives us the vector n and normalize it
     V3_T<T> n = simd_cross(pointA, pointB);
 
-    //Normalize n
+
     n.normalize();
 
-    // Extract nx, ny, nz components from vector n
+
     T nx = n[0];
     T ny = n[1];
     T nz = n[2];
@@ -50,14 +50,14 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_baselineEqn_perfor
     T nx_squared = nx * nx;
     T ny_squared = ny * ny;
     T nz_squared = nz * nz;
-    T nx_squared_plus_ny_squared = nx_squared + ny_squared;
+    T denominator = 1.0 - nz_squared;
 
     // Calculate s (as 's' in the formula)
-    T s = sqrt(nx_squared_plus_ny_squared - constZ * constZ);
+    T s = sqrt(denominator - constZ * constZ);
 
     // Calculate p_x and p_y, which are the x and y coordinates of the intersection
-    T p_x = - (constZ * nx * nz + s * ny) / 1.0 - nz_squared;
-    T p_y = - (constZ * ny * nz - s * nx) / 1.0 - nz_squared; // Only consider the minus
+    T p_x = - (constZ * nx * nz + s * ny) / denominator;
+    T p_y = - (constZ * ny * nz - s * nx) / denominator; // Only consider the minus
 
 
     return {p_x, p_y};
@@ -71,7 +71,7 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_oldEqn_performance
     V3_T<T> n = simd_cross(pointA, pointB);
     n.normalize();
 
-    // Extract nx, ny, nz components from vector n
+
     T nx = n[0];
     T ny = n[1];
     T nz = n[2];
@@ -98,14 +98,13 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_oldEqn_performance
 
 template<typename T>
 static std::tuple<T, T> gca_constLat_intersection_coordinates_newEqn_performance(const V3_T<T>& pointA, const V3_T<T>& pointB, const T &constZ) {
-    // Calculate the cross product, which gives us the vector n
+
     V3_T<T> n = simd_cross(pointA, pointB);
 
-    // Extract nx, ny, nz components from vector n
+
     T nx = n[0];
     T ny = n[1];
     T nz = n[2];
-
 
 
     // Calculate s (as 's' in the formula)
@@ -118,7 +117,6 @@ static std::tuple<T, T> gca_constLat_intersection_coordinates_newEqn_performance
 
     T s_tilde = sqrt(nx_squared_plus_ny_squared - norm_n_squared * constZ * constZ);
 
-    // T s_tilde = sqrt(nx_squared_plus_ny_squared - constZ * constZ);
 
     // Calculate p_x and p_y, which are the x and y coordinates of the intersection
     T p_x = - (constZ * nx * nz + s_tilde * ny)/nx_squared_plus_ny_squared;
@@ -136,45 +134,42 @@ class AccurateIntersection {
 public:
     template <typename T>
     static std::tuple<T, T> gca_constLat_intersection_accurate_performance(const std::array<T, 3>& x1, const std::array<T, 3>& x2, T z0) {
-        // Calculate nx, ny, nz and their errors
-        auto [nx, enx] = fmms_re(x1[1], x2[2], x1[2], x2[1]); // Component x
-        auto [ny, eny] = fmms_re(x1[2], x2[0], x1[0], x2[2]); // Component y
-        auto [nz, enz] = fmms_re(x1[0], x2[1], x1[1], x2[0]); // Component z
 
-        // Calculate sum of squares for nx and ny
+        auto [nx, enx] = AccuDOP(x1[1], x2[2], x1[2], x2[1]); 
+        auto [ny, eny] = AccuDOP(x1[2], x2[0], x1[0], x2[2]); 
+        auto [nz, enz] = AccuDOP(x1[0], x2[1], x1[1], x2[0]); 
+
+
         std::array<T, 2> nx_ny = {nx, ny};
         std::array<T, 2> enx_eny = {enx, eny};
-        auto [nx_squared_plus_ny_squared_pre, nx_squared_plus_ny_squared_err_pre] = sum_of_squares_re(nx_ny, enx_eny);
+        auto [S_2, s_2_err] = SumOfSquaresC(nx_ny, enx_eny);
 
-        auto [nx_squared_plus_ny_squared, nx_squared_plus_ny_squared_err] = two_sum(nx_squared_plus_ny_squared_pre,  nx_squared_plus_ny_squared_err_pre);
 
-        // Sum of squares for nx, ny, and nz
         std::array<T, 3> nxyz = {nx, ny, nz};
         std::array<T, 3> enxyz = {enx, eny, enz};
-        auto [norm_n_squared_pre, norm_n_squared_err_pre] = sum_of_squares_re(nxyz, enxyz);
+        auto [S_3, s_3_err] = SumOfSquaresC(nxyz, enxyz);
+        
 
-        auto [norm_n_squared, norm_n_squared_err] = two_sum(norm_n_squared_pre, norm_n_squared_err_pre);
-        // TwoProd for z0
         auto [C, c] = two_prod_fma(z0, z0);
 
-        // Compute dot product for J with itself and C
-        std::array<T, 4> norm_n_squared_array = {norm_n_squared, norm_n_squared, norm_n_squared_err, norm_n_squared_err};
+
+        std::array<T, 4> norm_n_squared_array = {S_3, S_3, s_3_err, s_3_err};
         std::array<T, 4> C_array = {C, c, C, c};
-        auto [J, j] = dot_fma_re(norm_n_squared_array, C_array);
+        auto [D, e_D] = CompDotC(norm_n_squared_array, C_array);
 
-        // TwoSum for -J and nx_squared_plus_ny_squared
-        auto [s2, f] = two_sum(T(-J), nx_squared_plus_ny_squared);
 
-        // VecSum for error correction
-        T es2 = -j + nx_squared_plus_ny_squared_err + f;
+        auto [E, e_err] = two_sum(T(-D), S_2);
 
-        // Apply two_sum to combine s2 and es2
-        auto [s2_, es2_] = two_sum(s2, es2);
 
-        // Accurate sqrt for s2 and es2
+        T es2 = -e_D + s_2_err + e_err;
+
+
+        auto [s2_, es2_] = two_sum(E, es2);
+
+
         auto [s, es] = acc_sqrt_re(s2_, es2_);
 
-        // Calculate terms for p_x
+
         auto [A_px, ea1_px] = two_prod_fma(nx, nz);
         T ea2_px = nx * enz;
         T ea3_px = nz * enx;
@@ -182,9 +177,9 @@ public:
 
         std::array<T, 6> vec1x = {A_px, ea_px, ny, eny, ny, eny};
         std::array<T, 6> vec2x = {z0, z0, s, s, es, es};
-        T D = dot_fma(vec1x, vec2x);
+        T x = dot_fma(vec1x, vec2x);
 
-        // Calculate terms for p_y
+
         auto [H, eh1] = two_prod_fma(ny, nz);
         T eh2 = ny * enz;
         T eh3 = nz * eny;
@@ -193,10 +188,10 @@ public:
         std::array<T, 6> vec1y = {H, eh, -nx, -enx, -nx, -enx};
         std::array<T, 6> vec2y = {z0, z0, s, s, es, es};
 
-        T E = dot_fma(vec1y, vec2y);
+        T y = dot_fma(vec1y, vec2y);
 
-        T res_x = -D/nx_squared_plus_ny_squared;
-        T res_y = -E/nx_squared_plus_ny_squared;
+        T res_x = -x/S_2;
+        T res_y = -y/S_2;
         return {res_x, res_y};
     }
 
@@ -220,7 +215,7 @@ private:
 
     // FMA-based product difference using template T
     template <typename T>
-    static std::tuple<T, T> fmms_re(T a, T b, T c, T d) {
+    static std::tuple<T, T> AccuDOP(T a, T b, T c, T d) {
         auto [p1, s1] = two_prod_fma(a, b);  
         T neg_d = -d;
         auto [h2, r2] = two_prod_fma(c, neg_d);
@@ -258,7 +253,7 @@ private:
     }
 
     template <typename T, std::size_t N>
-    static std::tuple<T, T> dot_fma_re(const std::array<T, N>& v1, const std::array<T, N>& v2) {
+    static std::tuple<T, T> CompDotC(const std::array<T, N>& v1, const std::array<T, N>& v2) {
         auto [s, c] = two_prod_fma(v1[0], v2[0]);
         for (std::size_t i = 1; i < N; ++i) {
             auto [p, pi] = two_prod_fma(v1[i], v2[i]);
@@ -266,12 +261,12 @@ private:
             std::tie(s, sigma) = two_sum(s, p); // Potential opportunity for speedup: do we really need this accuracy in the error term?
             c += pi + sigma;
         }
-        return std::make_tuple(s, c);  // Return the dot product and compensation term
+        return std::make_tuple(s, c);  
     }
 
     template <typename T, std::size_t N>
     static T dot_fma(const std::array<T, N>& v1, const std::array<T, N>& v2) {
-        auto [s, c] = dot_fma_re(v1, v2);
+        auto [s, c] = CompDotC(v1, v2);
         return s + c;
     }
 
@@ -284,27 +279,28 @@ private:
         T c = A_low + B_low;
         T d = h + c;
 
-        // Apply fast_two_sum for the final summation
+
         return fast_two_sum(H, d);
     }
 
     template <typename T, std::size_t N>
-    static std::tuple<T, T> sum_of_squares_re(const std::array<T, N>& vals, const std::array<T, N>& errs) {
-        // Initialize S and s based on type T
+    static std::tuple<T, T> SumOfSquaresC(const std::array<T, N>& vals, const std::array<T, N>& errs) {
+
         T S;
         T s;
         S = 0.0;
         s = 0.0;
 
         for (std::size_t i = 0; i < N; ++i) {
-            auto [P, p] = two_prod_fma(vals[i], vals[i]);  // Compute product and error for vals[i]^2
-            std::tie(S, s) = sum_non_neg(S, s, P, p);  // Sum with compensation
+            auto [P, p] = two_prod_fma(vals[i], vals[i]); 
+            std::tie(S, s) = sum_non_neg(S, s, P, p);  
         }
 
-        // Compute the dot product between the values and errors
-        T R = dot_fma(vals, errs);
 
-        return std::make_tuple(S, T(2 * R + s)); // Note: 2 * R is exact assuming no overflow
+        T R = dot_fma(vals, errs);
+        auto [S_new, s_err_new] = fast_two_sum(S, T(2 * R + s));
+
+        return std::make_tuple(S_new, s_err_new); 
     }
 };
 #endif //CODES_GCACONSTLATINTERSECTIONS_H
