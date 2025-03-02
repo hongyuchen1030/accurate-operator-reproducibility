@@ -1,7 +1,9 @@
-# Accuracy Experiments
-This section contains procedures to **reproduce the accuracy experiments** presented in the paper  
-**SIAM Journal on Scientific Computing: Accurate Intersection Point Calculation**.
 
+This repository contains procedures to reproduce the experiments presented in the paper  
+**SIAM Journal on Scientific Computing: Accurate Intersection Point Calculation** by Hongyu Chen, Paul A. Ullrich, and Julian Panetta.
+
+
+# Accuracy Experiments
 All required commands are stored in `./accuracy_experiments/run_accuracy_benchmark.sh`. Since this code uses `libquadmath`, we recommend building with recent version of GCC. The following instructions build the code with GCC-13.
 
 
