@@ -26,9 +26,9 @@ cmake -DCMAKE_C_COMPILER=gcc-13 \
 echo "Building the scalar benchmark..."
 make || exit 1
 
-# # Run the scalar benchmark executable
-# echo "Running the scalar benchmark..."
-# ./GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points || exit 1
+# Run the scalar benchmark executable
+echo "Running the scalar benchmark..."
+./GCA_ConstLat_Performance_Benchmark_scalar_MPFR_Points || exit 1
 
 # Run the parallel benchmark executable
 echo "Running the parallel benchmark..."
