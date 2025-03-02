@@ -1,6 +1,6 @@
 
 This repository contains procedures to reproduce the experiments presented in the paper  
-**SIAM Journal on Scientific Computing: Accurate Intersection Point Calculation** by Hongyu Chen, Paul A. Ullrich, and Julian Panetta.
+**SIAM Journal on Scientific Computing: Fast and Accurate Intersections on a Sphere** by Hongyu Chen, Paul A. Ullrich, and Julian Panetta.
 
 
 # Accuracy Experiments
